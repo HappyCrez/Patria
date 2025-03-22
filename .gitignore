@@ -1,0 +1,7 @@
+/bin
+/Docs/*.aux
+/Docs/*.fls
+/Docs/*.fdb_latexmk
+/Docs/*.log
+/Docs/*.synctex.gz
+/Docs/*.toc
