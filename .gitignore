@@ -1,3 +1,4 @@
+.vscode
 /bin
 /Docs/*.aux
 /Docs/*.fls
@@ -5,7 +6,6 @@
 /Docs/*.log
 /Docs/*.synctex.gz
 /Docs/*.toc
-ServerRunner
-.vscode
 run.sh
 PatriaServer
+/Server/build
