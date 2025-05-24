@@ -5,3 +5,7 @@
 /Docs/*.log
 /Docs/*.synctex.gz
 /Docs/*.toc
+ServerRunner
+.vscode
+run.sh
+PatriaServer
