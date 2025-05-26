@@ -47,18 +47,16 @@
             <div class="search_container">
                 <input id="search_bar" class="search" type="text" placeholder="search"/>
             </div>
-            <div class="dialogs_container">
-                <div class="dialog active_dialog">
+            <div id="dialogs_container">
+                <div id="Vladimir" class="dialog active_dialog">
                     <img src="assets/avatar.png"/>
                     Vladimir
                 </div>
-                <div class="dialog">
+                <div id="Ivan" class="dialog">
                     <img src="assets/avatar.png"/>
                     Ivan
                 </div>
             </div>
-
-            <hr class="patria_line">
         </div>
         <div class="message_side">
             <div class="messages_content">

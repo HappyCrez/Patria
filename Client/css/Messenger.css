@@ -25,11 +25,8 @@ body
 
 #messenger_page .bar_side
 {
-    display: flex;
-    flex-direction: column;
- 
     padding: 20px 20px;
-    width: 400px;
+    width: 20%;
 
     background-color: var(--bar-side-color);
     color: #fff;
@@ -46,7 +43,8 @@ body
     outline: none;
     border: none;
     border-radius: 20px;
-    height: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #messenger_page .bar_header
@@ -62,7 +60,13 @@ body
     margin-bottom: 10px;
 }
 
-#messenger_page .dialogs_container div
+#messenger_page #dialogs_container
+{
+    position: relative;
+    width: 100%;
+}
+
+#messenger_page #dialogs_container div
 {
     display: flex;
     flex-direction: row;
@@ -90,16 +94,19 @@ body
 {
     overflow: hidden;
     position: relative;
-    width: 100%;
+    width: 80%;
     height: auto;
 
     background: var(--message-side-color);
 
-    padding: 70px 100px 0 100px;
-
     background-size: cover;
     background-image: url("../assets/mainBG.png");
 }
+
+/* #messenger_page .message_container
+{
+    padding: 30px 0;
+} */
 
 #messenger_page .message_side img
 {
@@ -110,7 +117,14 @@ body
 
 #messenger_page .messages_content
 {
-    margin: 0 auto;
+    position: absolute;
+    
+    left: 50%;
+    top: 30px;
+    transform: translate(-50%,0);
+
+    width: 100%;
+    height: 100%;
     max-width: var(--messages-block-max-width);
 }
 
@@ -151,16 +165,6 @@ body
     background-color: #8738ef;
 }
 
-#messenger_page .messages_content
-{
-    padding: 0;
-    margin: 0 auto;
-
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
 #messenger_page .time
 {
     align-self: flex-end;
@@ -174,7 +178,7 @@ body
 
     width: 100%;
     position: absolute;
-    bottom: 20px;
+    bottom: 60px;
 }
 
 #messenger_page .input_container

@@ -14,6 +14,9 @@ int on_data_payload(void *user_data, char *buff, size_t len)
         json_data *dataType = parse_json_row(&request);
         printf("'%s':'%s'\n", (char *)dataType->field_name->first, (char *)dataType->field_val->first);
 
+        /* Critical section work with shared data (shared_bst)*/
+        pthread_mutex_lock(ws_info->mutex);
+
         if (strcmp((char *)dataType->field_name->first, WS_LOGIN) == 0)
         {
                 // login
@@ -26,17 +29,16 @@ int on_data_payload(void *user_data, char *buff, size_t len)
                 ws_info->client_info->first = (ll)malloc(login->field_val->second * sizeof(char));
                 strcpy((char *)ws_info->client_info->first, (char *)login->field_val->first);
 
-                bst_insert(ws_info->network_manager->ws_clients, ws_info->client_info);
-                postorder_traversal(ws_info->network_manager->ws_clients->root);
+                bst_insert(ws_info->shared_bst, ws_info->client_info);
+                postorder_traversal(ws_info->shared_bst->root);
         }
         else if (strstr((char *)dataType->field_name->first, WS_SEND_MESSAGE))
         {
                 // Send message
                 json_data *reciver = parse_json_row(&request);
                 printf("'%s':'%s'\n", (char *)reciver->field_name->first, (char *)reciver->field_val->first); // TODO::DELETE
-
-                struct pair search_data = {(ll)reciver->field_val->first, 0ll};
-                struct bst_node *node = bst_search(ws_info->network_manager->ws_clients, &search_data);
+                
+                struct bst_node *node = bst_search(ws_info->shared_bst, (char *)reciver->field_val->first);
                 if (node)
                 {
                         // Get msg
@@ -53,6 +55,9 @@ int on_data_payload(void *user_data, char *buff, size_t len)
 
                 free(reciver);
         }
+
+        pthread_mutex_unlock(ws_info->mutex); /* Unlock access */
+
         free(dataType);
         return WS_OK;
 }

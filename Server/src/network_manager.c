@@ -11,10 +11,11 @@
 int network_manager_init(struct network_manager *network_manager, struct server *server)
 {
         network_manager->server = server;
+        network_manager->mutex = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
 
         // Init BST for resolving login-socket struct pairs
         network_manager->ws_clients = malloc(sizeof(struct bst));
-        bst_init(network_manager->ws_clients, string_compare);
+        bst_init(network_manager->ws_clients);
 
         // WebSocket parser callbacks
         struct ws_parser_callbacks *callbacks = malloc(sizeof(struct ws_parser_callbacks));
@@ -29,7 +30,7 @@ int network_manager_init(struct network_manager *network_manager, struct server 
 
         if (__OUTPUT_LOGS)
         {
-                printf("server: Init struct network_manager\n");
+                printf("Network_manager: Created\n");
         }
 
         return SUCCESS;
@@ -42,7 +43,7 @@ void network_manager_destroy(struct network_manager *network_manager)
 
         if (__OUTPUT_LOGS)
         {
-                printf("server: Destroy struct network_manager\n");
+                printf("Network_manager: Destroyed \n");
         }
 }
 
@@ -175,11 +176,11 @@ enum http_get_types getPostType(char **request)
         return type;
 }
 
-struct pair serveWebSocket(struct web_socket_routine *ws_args, struct pair frame)
+struct pair serveWebSocket(struct web_socket_routine *ws_info, struct pair frame)
 {
         struct ws_parser parser;
         ws_parser_init(&parser);
-        int rc = ws_parser_execute(&parser, ws_args->network_manager->callbacks, (void *)ws_args, (char *)frame.first, frame.second);
+        int rc = ws_parser_execute(&parser, ws_info->callbacks, (void *)ws_info, (char *)frame.first, frame.second);
         if (rc != WS_OK)
         {
                 printf("web_socket parser failed: %d %s\n", rc, ws_parser_error(rc));
@@ -188,12 +189,10 @@ struct pair serveWebSocket(struct web_socket_routine *ws_args, struct pair frame
 
 void *serveConnection(void *arg)
 {
-        struct web_socket_routine *ws_args = (struct web_socket_routine *)arg;
-        struct network_manager *network_manager = (struct network_manager *)ws_args->network_manager;
-
+        struct web_socket_routine *ws_info = (struct web_socket_routine *)arg;
+        
         // Information about connection {(char*)login, socket}
-        struct pair *client_info = (struct pair *)ws_args->client_info;
-
+        struct pair *client_info = (struct pair *)ws_info->client_info; 
         struct pair frame = {(ll)malloc(MAX_REQUEST_SIZE * sizeof(char)), 0ll};
         while (TRUE)
         {
@@ -205,11 +204,21 @@ void *serveConnection(void *arg)
                         break;
                 }
                 ((char *)frame.first)[frame.second] = '\0';
-                serveWebSocket(ws_args, frame);
+                serveWebSocket(ws_info, frame);
         }
         close(client_info->second);
-        // TODO::Delete element from bst
-        free(ws_args);
+
+        /**
+         *  Verify that connection is not closed before login write in client_info
+         *  And exist node with that login
+         *  This is critical section work with shared data (shared_bst)
+         */
+        pthread_mutex_lock(ws_info->mutex);
+        if (client_info->first && bst_search(ws_info->shared_bst, (char *)client_info->first))
+                bst_delete_node(ws_info->shared_bst, (char *)client_info->first);
+        pthread_mutex_unlock(ws_info->mutex);
+
+        free(ws_info);
         pthread_exit(0);
 }
 
@@ -267,7 +276,9 @@ void network_manager_accept_connection(struct network_manager *network_manager)
                 pthread_t thread_id;
 
                 // Fill struct fields
-                ws_args->network_manager = network_manager;
+                ws_args->mutex = &network_manager->mutex;
+                ws_args->callbacks = network_manager->callbacks;
+                ws_args->shared_bst = network_manager->ws_clients;
                 ws_args->client_info = malloc(sizeof(struct pair));
                 ws_args->client_info->first = (ll)NULL;
                 ws_args->client_info->second = client_socket;

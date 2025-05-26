@@ -1,28 +1,23 @@
 /*              WebSocket               */
 let socket;
-let connection_delay = 2000;
-connectToServer();
+let connection_delay = 1000;
 function connectToServer() {
     try {
         socket = new WebSocket("ws://127.0.0.1:8080/WebSocket");
         socket.onopen = () => {
             console.log("Connected");
-            connection_delay = 2000;
         };
 
-        socket.onerror = (err) => {
-            console.log(
-                "Connection failed. Try again after:" +
-                connection_delay / 1000
-            );
+        socket.onmessage = (event) => {
+            console.log(event.data);
+        }
+
+        socket.onerror = (event) => {
             setTimeout(function () {
                 connectToServer();
             }, connection_delay);
-            connection_delay *= 2;
         };
-    } catch (e) {
-        // console.error('WebSocket error!');
-    }
+    } catch (e) { }
 }
 
 function wsSend(data) {
@@ -58,18 +53,31 @@ function setVisible(page) {
     page.classList.add('active_page');
 }
 
+function setPageState(new_state) {
+    state = new_state;
+
+    switch(new_state) {
+    case states.LOGIN_PAGE:
+        setVisible(login_page);
+        break;
+    case states.MESSENGER_PAGE:
+        setVisible(messenger_page);
+        break;
+    }
+}
+
 setup();
 function setup() {
-    state = states.LOGIN_PAGE;
-    setVisible(login_page);
+    setPageState(state.LOGIN_PAGE);
+    connectToServer();
 }
 
 document.addEventListener('keydown', (event) => {
     switch(state) {
-    case LOGIN_PAGE:
-        loginPageOnKeyDown();
+    case states.LOGIN_PAGE:
+        loginPageOnKeyDown(event);
         break;
-    case MESSENGER_PAGE:
+    case states.MESSENGER_PAGE:
         messengerPageOnKeyDown(event);
         break;
     }
@@ -77,10 +85,10 @@ document.addEventListener('keydown', (event) => {
 
 document.addEventListener('click', (event) => {
     switch(state) {
-    case LOGIN_PAGE:
+    case states.LOGIN_PAGE:
 
         break;
-    case MESSENGER_PAGE:
+    case states.MESSENGER_PAGE:
         messengerPageOnClick(event);
         break;
     }
@@ -96,14 +104,18 @@ const options = {
     method: "POST", // default
 };
 
-function loginPageOnKeyDown() {
+function loginPageOnKeyDown(event) {
     if (socket) {
-        login();
+        if (!event.shiftKey && event.key == 'Enter') {
+            login();
+        }
     }
 }
 
 login_submit.addEventListener("click", (event) => {
-    login();
+    if (socket) {
+        login();
+    }
 });
 
 function login() {
@@ -111,11 +123,17 @@ function login() {
 
     // TODO::Listen server to sync dialogs and messages
     // Then parse data and send it to messenger_page
-    data = {
-        
-    };
-    messengerPageSetup(data);
-    setVisible(messenger_page);
+    // data = {
+    //     dialogs: ['name2', 'name3'],
+    //     name1:
+    //     [
+    //         'name2:Hello:' + Date.now(),
+    //         'name3::Hi!' + Date.now(),
+    //         'name2:What are you doing!' + Date.now(),
+    //         'name2:I am win a prize today!' + Date.now()
+    //     ]
+    // };
+    messengerPageSetup('stroke');
 }
 
 /*              Messenger page               */
@@ -125,10 +143,11 @@ const bar_scroll = document.getElementById('bar_scroll');
 const message_input = document.getElementById('message_input');
 
 let dialogs_list = [];
-let reciver = "";
+let reciver = null;
 
 function messengerPageSetup(data) {
-
+    dialogs_list = document.getElementById('dialogs_container').children;
+    setPageState(states.MESSENGER_PAGE);
 }
 
 // Replace sequences of repeat '\n' or ' ' by one occurence
@@ -190,7 +209,7 @@ messages.addEventListener('wheel', (event) => {
 });
 
 bar_scroll.addEventListener('wheel', (event) => {
-    console.log("321");
+
 });
 
 
@@ -210,6 +229,17 @@ function messengerPageOnKeyDown(event) {
     }
 }
 
+function setActiveDialog(dialog) {
+    for (element of dialogs_list) {
+        element.classList.remove('active_dialog');
+    }
+    dialog.classList.add('active_dialog');
+}
+
 function messengerPageOnClick(event) {
-    
+    if (event.srcElement.classList.contains('dialog') == false)
+        return;
+    setActiveDialog(event.srcElement);
+    reciver = event.srcElement.id;
+    console.log(reciver);
 }

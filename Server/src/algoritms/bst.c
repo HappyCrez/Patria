@@ -1,9 +1,8 @@
 #include "algoritms/bst.h"
 
-void bst_init(struct bst *tree, compare_func cmp_func)
+void bst_init(struct bst *tree)
 {
         tree->root = NULL;
-        tree->cmp_func = cmp_func;
 }
 
 /**
@@ -31,13 +30,14 @@ void bst_destroy(struct bst *tree)
  * @key: value
  * Return: ptr on new struct bst_node or NULL
  */
-static struct bst_node *bst_create_node(struct pair *key)
+static struct bst_node *bst_create_node(struct pair data)
 {
         struct bst_node *node = malloc(sizeof(struct bst_node));
         if (!node)
                 return NULL; /* Malloc error */
 
-        node->key = key;
+        node->key = (char *)data.first;
+        node->val = data.second;
         node->left = NULL;
         node->right = NULL;
 
@@ -45,46 +45,49 @@ static struct bst_node *bst_create_node(struct pair *key)
 }
 
 /* Recursive realization -> bst_insert */
-static struct bst_node *bst_insert_node(struct bst_node *node, compare_func cmp_func, struct pair *key)
+static struct bst_node *bst_insert_node(struct bst_node *node, char *key)
 {
         if (!node)
-                return bst_create_node(key);
+                return bst_create_node((struct pair){(ll)key,0ll});
 
-        if (cmp_func(key, node->key) < 0)
-                node->left = bst_insert_node(node->left, cmp_func, key);
-        else if (cmp_func(key, node->key) > 0)
-                node->right = bst_insert_node(node->right, cmp_func, key);
-        /* if key in already in the tree -> do nothing */
-
+        if (strcmp(key, node->key) < 0)
+                node->left = bst_insert_node(node->left, key);
+        else if (strcmp(key, node->key) > 0)
+                node->right = bst_insert_node(node->right, key);
+                
+        /* if key in already in the tree -> return this node to update its value */
         return node;
 }
 
-struct bst_node *bst_insert(struct bst *tree, struct pair *key)
+struct bst_node *bst_insert(struct bst *tree, struct pair *data)
 {
-        struct bst_node *node = bst_insert_node(tree->root, tree->cmp_func, key);
+        /* If bst already has node this data->first key, then update it value */
+        struct bst_node *node = bst_insert_node(tree->root, (char *)data->first);
+        node->val = data->second; 
+
         if (!tree->root)
                 tree->root = node;
         return node;
 }
 
 /* Recursive realization -> bst_search */
-static struct bst_node *bst_search_node(struct bst_node *node, compare_func cmp_func, struct pair *key)
+static struct bst_node *bst_search_node(struct bst_node *node, char *key)
 {
         if (!node)
                 return NULL;
 
-        if (cmp_func(key, node->key) == 0)
+        if (strcmp(key, node->key) == 0)
                 return node;
 
-        if (cmp_func(key, node->key) < 0)
-                return bst_search_node(node->left, cmp_func, key);
+        if (strcmp(key, node->key) < 0)
+                return bst_search_node(node->left, key);
 
-        return bst_search_node(node->right, cmp_func, key);
+        return bst_search_node(node->right, key);
 }
 
-struct bst_node *bst_search(struct bst *tree, struct pair *key)
+struct bst_node *bst_search(struct bst *tree, char *key)
 {
-        return bst_search_node(tree->root, tree->cmp_func, key);
+        return bst_search_node(tree->root, key);
 }
 
 void postorder_traversal(struct bst_node *node)
@@ -94,20 +97,34 @@ void postorder_traversal(struct bst_node *node)
 
         postorder_traversal(node->left);
         postorder_traversal(node->right);
-        printf("%s\n", (char *)node->key->first);
+        printf("%s\n", (char *)node->key);
 }
 
-struct bst_node *bst_delete_node(struct bst_node *root, struct pair *key)
+/* Find last left node in tree */
+static struct bst_node *bst_min_node(struct bst_node *node)
+{
+    while (node && node->left)
+        node = node->left;
+    return node;
+}
+
+/**
+ * Delete node
+ * @root: ptr on root node
+ * @key: ptr on key
+ * Return: ptr on new root
+ */
+static struct bst_node *bst_delete_node_recursive(struct bst_node *root, char *key)
 {
     struct bst_node *temp;
 
     if (!root)
         return NULL;
 
-    if (key < root->key) {
-        root->left = bst_delete_node(root->left, key);
-    } else if (key > root->key) {
-        root->right = bst_delete_node(root->right, key);
+    if (strcmp(key, root->key) < 0) {
+        root->left = bst_delete_node_recursive(root->left, key);
+    } else if (strcmp(key, root->key) > 0) {
+        root->right = bst_delete_node_recursive(root->right, key);
     } else {
         if (!root->left) {
             temp = root->right;
@@ -121,8 +138,12 @@ struct bst_node *bst_delete_node(struct bst_node *root, struct pair *key)
 
         temp = bst_min_node(root->right);
         root->key = temp->key;
-        root->right = bst_delete_node(root->right, temp->key);
+        root->right = bst_delete_node_recursive(root->right, temp->key);
     }
-
     return root;
+}
+
+void bst_delete_node(struct bst *ptr, char *key)
+{
+        ptr->root = bst_delete_node_recursive(ptr->root, key);
 }

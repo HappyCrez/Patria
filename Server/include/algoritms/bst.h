@@ -9,7 +9,8 @@ typedef int(*compare_func) (struct pair *key1, struct pair *key2);
  */ 
 struct bst_node
 {
-        struct pair *key;
+        char *key;
+        int val;
         struct bst_node *left;
         struct bst_node *right;
 };
@@ -29,15 +30,15 @@ struct bst
  * Init struct bst
  * @tree: ptr on struct bst
  */
-void bst_init(struct bst *tree, compare_func cmp_func);
+void bst_init(struct bst *tree);
 
 /**
- * Insert key in bst
+ * Insert pair {key,val} in bst
  * @tree: ptr on struct bst
- * @key: value
+ * @data: pair {key,value}
  * Return: ptr on new bst_node or NULL
  */
-struct bst_node *bst_insert(struct bst *tree, struct pair *key);
+struct bst_node *bst_insert(struct bst *tree, struct pair *data);
 
 /**
  * Search key in bst
@@ -45,7 +46,7 @@ struct bst_node *bst_insert(struct bst *tree, struct pair *key);
  * @key: value
  * Return: ptr on struct bst_node or NULL
  */
-struct bst_node *bst_search(struct bst *tree, struct pair *key);
+struct bst_node *bst_search(struct bst *tree, char *key);
 
 /**
  * Destroy tree
@@ -61,7 +62,7 @@ void postorder_traversal(struct bst_node *node);
 
 /**
  * Delete node
- * @root: ptr on root node
- * @key: ptr on key
+ * @bst: ptr on struct bst where to find key for delete operation
+ * @key: ptr on struct pair, what we want to delete from bst
  */
-struct bst_node *bst_delete_node(struct bst_node *root, struct pair *key);
+void bst_delete_node(struct bst *ptr, char *key);

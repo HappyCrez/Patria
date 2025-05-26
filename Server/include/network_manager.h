@@ -13,6 +13,7 @@
 
 struct network_manager
 {
+        pthread_mutex_t mutex;
         server *server;
         struct bst *ws_clients;
         struct ws_parser_callbacks *callbacks;
@@ -20,7 +21,9 @@ struct network_manager
 
 struct web_socket_routine
 {
-        struct network_manager *network_manager;
+        pthread_mutex_t *mutex;
+        struct ws_parser_callbacks *callbacks;
+        struct bst *shared_bst;         
         struct pair *client_info;       /* pair{socket,login} */
         pthread_t *pthread;             /* WebSocket handler thread */
 };
