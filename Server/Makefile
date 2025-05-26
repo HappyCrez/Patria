@@ -3,12 +3,14 @@
 
 TARGET = PatriaServer
 
-SRC = 									\
-	src/main.c 							\
-	src/server.c 						\
+SRC = 							\
+	src/main.c 					\
+	src/server.c 					\
 	src/network_manager.c 				\
-	src/algoritms.c 					\
-	src/file_helper.c 					\
+	src/algoritms/base64_coder.c 			\
+	src/algoritms/bst.c				\
+	src/algoritms/common_base_algoritms.c		\
+	src/file_helper.c 				\
 	src/web_socket_handler.c			\
 	src/parsers/json_parser.c 			\
 	src/parsers/web_socket_parser.c	

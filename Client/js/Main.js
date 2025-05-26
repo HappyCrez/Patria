@@ -46,7 +46,8 @@ function sendMessage() {
     message = formatMessage(message_input.value);
     if (message_input.value.length <= 0) return;
     
-    wsSend('{"recv_messages":"True","recv":"reciver_id","message_content":"' + message + '"}');
+    login = "special_login"
+    wsSend('{"send_message":"True","reciver_login":"' + login + '","message_content":"' + message + '"}');
     
     message = message.replace(/\n/g, '<br>');
     appendMessage(message, true)

@@ -1,37 +1,40 @@
 #pragma once
-#include <stdio.h>
-#include <stdint.h>
+// #include <openssl/ssl.h> // try to set ssl connection
+// #include <openssl/err.h>
+#include <openssl/sha.h>
+#include <arpa/inet.h>
+#include <pthread.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
-#include <arpa/inet.h>
-#include <openssl/sha.h>
-#include <pthread.h>
-// #include <openssl/ssl.h> // try to set ssl connection
-// #include <openssl/err.h> 
-
-#define __DEBUG 1
-#define __OUTPUT_LOGS 1
+#include <stdio.h>
 
 // Base definitions
 typedef long long ll;
 typedef char bool;
 typedef char byte;
+
+#define __DEBUG 1
+#define __OUTPUT_LOGS 1
+
 #define TRUE 1
 #define FALSE 0
 
+#define MEMORY_ERROR 1
+
 struct pair
 {
-    ll first;
-    ll second;
+        ll first;
+        ll second;
 };
 
 struct server_response
 {
-    struct pair *data;
-    bool isWS;
+        struct pair *data;
+        bool isWS;
 };
 
 // Pages
@@ -42,32 +45,32 @@ struct server_response
 
 // TCP connection
 #define SERVER_PORT 8080
-#define MAX_REQUEST_SIZE 8000  // HTTP specification recommend
+#define MAX_REQUEST_SIZE 8000 // HTTP specification recommend
 
 enum connection_error
 {
-    SUCCESS = 0,
-    SOCKET_ERROR,
-    BIND_ERROR,
-    LISTEN_ERROR,
-    OPT_ERROR
+        SUCCESS = 0,
+        SOCKET_ERROR,
+        BIND_ERROR,
+        LISTEN_ERROR,
+        OPT_ERROR
 };
 
 enum http_request
 {
-    UNKNOWN_REQUEST,
-    GET_REQUEST,
-    POST_REQUEST
+        UNKNOWN_REQUEST,
+        GET_REQUEST,
+        POST_REQUEST
 };
 
 // GET
 #define HTTP_GET "GET"
-#define HTTP_WS  "WebSocket"
+#define HTTP_WS "WebSocket"
 
 enum http_get_types
 {
-    STD_URL,
-    WEB_SOCKET_URL
+        STD_URL,
+        WEB_SOCKET_URL
 };
 
 // POST types
@@ -78,10 +81,10 @@ enum http_get_types
 
 enum http_post_types
 {
-    UNKNOWN_POST,
-    LOGIN_POST,
-    RECIVE_MESSAGES_POST,
-    RECIVE_DIALOGS_POST
+        UNKNOWN_POST,
+        LOGIN_POST,
+        RECIVE_MESSAGES_POST,
+        RECIVE_DIALOGS_POST
 };
 
 // WEB SOCKET (WS)
@@ -98,20 +101,20 @@ enum http_post_types
 
 enum ws_frame_type_t
 {
-    WS_FRAME_TEXT   = 0x1,
-    WS_FRAME_BINARY = 0x2,
-    WS_FRAME_CLOSE  = 0x8,
-    WS_FRAME_PING   = 0x9,
-    WS_FRAME_PONG   = 0xA,
+        WS_FRAME_TEXT = 0x1,
+        WS_FRAME_BINARY = 0x2,
+        WS_FRAME_CLOSE = 0x8,
+        WS_FRAME_PING = 0x9,
+        WS_FRAME_PONG = 0xA,
 };
 
 enum ws_parser_error_codes
 {
-    WS_OK,
-    WS_RESERVED_BITS_SET,
-    WS_INVALID_OPCODE,
-    WS_INVALID_CONTINUATION,
-    WS_CONTROL_TOO_LONG,
-    WS_NON_CANONICAL_LENGTH,
-    WS_FRAGMENTED_CONTROL
+        WS_OK,
+        WS_RESERVED_BITS_SET,
+        WS_INVALID_OPCODE,
+        WS_INVALID_CONTINUATION,
+        WS_CONTROL_TOO_LONG,
+        WS_NON_CANONICAL_LENGTH,
+        WS_FRAGMENTED_CONTROL
 };
