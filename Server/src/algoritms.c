@@ -1,6 +1,6 @@
-#include "Algoritms.h"
+#include "algoritms.h"
 
-bool stringCompare(char *str1, char *str2)
+bool string_compare(char *str1, char *str2)
 {
     bool is_the_same = TRUE;
     for (int i = 0; *(str1+i) != '\0' && *(str2+i) != '\0'; ++i)

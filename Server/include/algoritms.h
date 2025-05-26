@@ -1,5 +1,5 @@
 #pragma once
-#include "Dependencies.h"
+#include "dependencies.h"
 
 // ----------------------------------
 // Copyright (c) 2017 Brian Barto
@@ -13,4 +13,4 @@ unsigned char *base64simple_decode(char *, size_t, size_t *);
 // ----------------------------------
 
 // Check that any of strings is having another  
-bool stringCompare(char *str1, char *str2);
+bool string_compare(char *str1, char *str2);

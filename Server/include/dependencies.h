@@ -22,17 +22,17 @@ typedef char byte;
 #define TRUE 1
 #define FALSE 0
 
-typedef struct
+struct pair
 {
     ll first;
     ll second;
-} Pair;
+};
 
-typedef struct
+struct server_response
 {
-    Pair *data;
+    struct pair *data;
     bool isWS;
-} ServerResponse;
+};
 
 // Pages
 #define MAX_FILEPATH_SIZE 1000 // The most depeer files is more shorter than 1000 symbols
@@ -44,31 +44,31 @@ typedef struct
 #define SERVER_PORT 8080
 #define MAX_REQUEST_SIZE 8000  // HTTP specification recommend
 
-typedef enum
+enum connection_error
 {
     SUCCESS = 0,
     SOCKET_ERROR,
     BIND_ERROR,
     LISTEN_ERROR,
     OPT_ERROR
-} CONNECTION_ERROR;
+};
 
-typedef enum
+enum http_request
 {
     UNKNOWN_REQUEST,
     GET_REQUEST,
     POST_REQUEST
-} HTTP_REQUEST;
+};
 
 // GET
 #define HTTP_GET "GET"
 #define HTTP_WS  "WebSocket"
 
-typedef enum
+enum http_get_types
 {
     STD_URL,
     WEB_SOCKET_URL
-} HTTP_GET_TYPES;
+};
 
 // POST types
 #define HTTP_POST "POST"
@@ -76,13 +76,13 @@ typedef enum
 #define HTTP_POST_RECV_MESSAGES "recv_messages"
 #define HTTP_POST_RECV_DIALOGS "recv_dialogs"
 
-typedef enum
+enum http_post_types
 {
     UNKNOWN_POST,
     LOGIN_POST,
     RECIVE_MESSAGES_POST,
     RECIVE_DIALOGS_POST
-} HTTP_POST_TYPES;
+};
 
 // WEB SOCKET (WS)
 #define WS_KEY_LEN 24
@@ -96,15 +96,17 @@ typedef enum
 #define SHA1_LEN 41
 #define BASE64_LEN 56
 
-typedef enum {
+enum ws_frame_type_t
+{
     WS_FRAME_TEXT   = 0x1,
     WS_FRAME_BINARY = 0x2,
     WS_FRAME_CLOSE  = 0x8,
     WS_FRAME_PING   = 0x9,
     WS_FRAME_PONG   = 0xA,
-} ws_frame_type_t;
+};
 
-typedef enum {
+enum ws_parser_error_codes
+{
     WS_OK,
     WS_RESERVED_BITS_SET,
     WS_INVALID_OPCODE,
@@ -112,4 +114,4 @@ typedef enum {
     WS_CONTROL_TOO_LONG,
     WS_NON_CANONICAL_LENGTH,
     WS_FRAGMENTED_CONTROL
-} WS_PARSER_ERROR_CODES;
+};

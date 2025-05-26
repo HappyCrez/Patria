@@ -1,9 +1,9 @@
-#include "FileHelper.h"
-#include "Algoritms.h"
+#include "file_helper.h"
+#include "algoritms.h"
 
-Pair *createHTTPResponse(char* filename)
+struct pair *createHTTPResponse(char* filename)
 {
-    Pair *response = malloc(sizeof(Pair));
+    struct pair *response = malloc(sizeof(struct pair));
     memset(response, 0, sizeof(response));
 
     // Open the file in read mode

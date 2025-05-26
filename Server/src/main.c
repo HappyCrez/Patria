@@ -1,5 +1,5 @@
-#include "Dependencies.h"
-#include "Server.h"
+#include "dependencies.h"
+#include "server.h"
 
 void showErrorCode(int error_code)
 {
@@ -22,8 +22,8 @@ void showErrorCode(int error_code)
 
 int main(int argc, char** argv)
 {
-    Server *server;
-    int code = InitServer(server, SERVER_PORT);
+    struct server *server;
+    int code = init_server(server, SERVER_PORT);
     if (code != SUCCESS)
     {
         showErrorCode(code);
@@ -33,8 +33,8 @@ int main(int argc, char** argv)
     // Infinity loop
     // Can be breaken by server fault or 
     // TODO::Special admin post request
-    StartServer(server);
-    DestroyServer(server);
+    start_server(server);
+    destroy_server(server);
     return 0;
 
     //char buffer = {0};

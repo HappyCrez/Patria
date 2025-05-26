@@ -1,15 +1,15 @@
-#include "WebSocketHandle.h"
-#include "Parsers/JSONParser.h"
+#include "web_socket_handler.h"
+#include "parsers/json_parser.h"
 
-int onDataPayload(void* user_data, const char* buff, size_t len)
+int on_data_payload(void* user_data, const char* buff, size_t len)
 {
     printf("%s\n\n", buff);
     char *request = buff;
     ++request; // Skip --> {
-    JSONData *dataType = parseJSONRow(&request);
+    json_data *dataType = parse_json_row(&request);
 
-    JSONData *reciver = parseJSONRow(&request);
-    JSONData *message = parseJSONRow(&request);
+    json_data *reciver = parse_json_row(&request);
+    json_data *message = parse_json_row(&request);
 
 
     printf("'%s':'%s'\n", (char*)dataType->field_name->first, (char*)dataType->field_val->first);
@@ -22,7 +22,7 @@ int onDataPayload(void* user_data, const char* buff, size_t len)
     return WS_OK;
 }
 
-int onControlBegin(void* user_data, ws_frame_type_t frame_type)
+int on_control_begin(void* user_data, enum ws_frame_type_t frame_type)
 {
     (void)user_data;
 
@@ -35,7 +35,7 @@ int onControlBegin(void* user_data, ws_frame_type_t frame_type)
     return WS_OK;
 }
 
-int onControlPayload(void* user_data, const char* buff, size_t len)
+int on_control_payload(void* user_data, const char* buff, size_t len)
 {
     (void)user_data;
 

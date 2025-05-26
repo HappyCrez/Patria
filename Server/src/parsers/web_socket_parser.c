@@ -1,4 +1,4 @@
-#include "Parsers/WebSocketParser.h"
+#include "parsers/web_socket_parser.h"
 
 enum
 {
@@ -21,7 +21,7 @@ enum
     S_PAYLOAD,
 };
 
-void ws_parser_init(wsParser *parser)
+void ws_parser_init(struct ws_parser *parser)
 {
     parser->state = S_OPCODE;
     parser->fragment = 0;
@@ -39,8 +39,8 @@ void ws_parser_init(wsParser *parser)
     }
 
 int ws_parser_execute(
-    wsParser *parser,
-    const wsParserCallbacks *callbacks,
+    struct ws_parser *parser,
+    const struct ws_parser_callbacks *callbacks,
     void *data,
     char *buff /* mutates! */,
     size_t len)
@@ -86,9 +86,9 @@ int ws_parser_execute(
 
                 parser->control = 1;
                 int rc = WS_OK;
-                if (callbacks->onControlBegin)
+                if (callbacks->on_control_begin)
                 {
-                    rc = callbacks->onControlBegin(data, opcode);
+                    rc = callbacks->on_control_begin(data, opcode);
                     if (rc)
                     {
                         return rc;
@@ -106,9 +106,9 @@ int ws_parser_execute(
                 parser->fragment = !parser->fin;
 
                 int rc = WS_OK;
-                if (callbacks->onDataBegin)
+                if (callbacks->on_data_begin)
                 {
-                    rc = callbacks->onDataBegin(data, opcode);
+                    rc = callbacks->on_data_begin(data, opcode);
                     if (rc)
                     {
                         return rc;
@@ -297,16 +297,16 @@ int ws_parser_execute(
             int rc = WS_OK;
             if (parser->control)
             {
-                if (callbacks->onControlPayload)
+                if (callbacks->on_control_payload)
                 {
-                    rc = callbacks->onControlPayload(data, buff, chunk_length);
+                    rc = callbacks->on_control_payload(data, buff, chunk_length);
                 }
             }
             else
             {
-                if (callbacks->onDataPayload)
+                if (callbacks->on_data_payload)
                 {
-                    rc = callbacks->onDataPayload(data, buff, chunk_length);
+                    rc = callbacks->on_data_payload(data, buff, chunk_length);
                 }
             }
 
@@ -333,16 +333,16 @@ int ws_parser_execute(
                 int rc = WS_OK;
                 if (parser->control)
                 {
-                    if (callbacks->onControlEnd)
+                    if (callbacks->on_control_end)
                     {
-                        rc = callbacks->onControlEnd(data);
+                        rc = callbacks->on_control_end(data);
                     }
                 }
                 else
                 {
-                    if (callbacks->onDataEnd)
+                    if (callbacks->on_data_end)
                     {
-                        rc = callbacks->onDataEnd(data);
+                        rc = callbacks->on_data_end(data);
                     }
                 }
                 if (rc)

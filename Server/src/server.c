@@ -1,7 +1,7 @@
-#include "Server.h"
-#include "NetworkManager.h"
+#include "server.h"
+#include "network_manager.h"
 
-int InitServer(Server *server, int listen_port)
+int init_server(server *server, int listen_port)
 {
     server->addrlen = sizeof(struct sockaddr_in);
     if ((server->server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
@@ -31,32 +31,32 @@ int InitServer(Server *server, int listen_port)
     
     if (__OUTPUT_LOGS)
     {
-        printf("Server: setup success\n");
+        printf("server: setup success\n");
     }
     
-    server->network_manager = malloc(sizeof(NetworkManager));
-    return InitNetworkManager(server->network_manager, server);
+    server->network_manager = malloc(sizeof(network_manager));
+    return init_network_manager(server->network_manager, server);
 }
 
-void DestroyServer(Server *server)
+void destroy_server(server *server)
 {
     shutdown(server->server_fd, SHUT_RDWR); // ShutDown all connections 
     close(server->server_fd);               // Close socket file descriptor
 
-    DestroyNetworkManager(server->network_manager);
+    destroy_network_manager(server->network_manager);
     free(server);
 
     if (__OUTPUT_LOGS)
     {
-        printf("Server: shutdown\n");
+        printf("server: shutdown\n");
     }
 }
 
-void StartServer(Server *server)
+void start_server(server *server)
 {
     if (__OUTPUT_LOGS)
     {
-        printf("Server: ready to serve connections\n");
+        printf("server: ready to serve connections\n");
     }
-    acceptConnection(server->network_manager);
+    accept_connection(server->network_manager);
 }

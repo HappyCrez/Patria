@@ -1,21 +1,21 @@
-#include "Parsers/JSONParser.h"
+#include "parsers/json_parser.h"
 
-void InitJSONData(JSONData *ptr, Pair *field_name, Pair *field_val)
+void init_json_data(json_data *ptr, struct pair *field_name, struct pair *field_val)
 {
     ptr->field_name = field_name;
     ptr->field_val = field_val;
 }
 
-void DestroyJSONData(JSONData *ptr)
+void destroy_json_data(json_data *ptr)
 {
     free(ptr->field_name);
     free(ptr->field_val);
     free(ptr);
 }
 
-Pair *parseJSONField(char **request)
+struct pair *parse_json_field(char **request)
 {
-    Pair *response = malloc(sizeof(Pair));
+    struct pair *response = malloc(sizeof(struct pair));
 
     (*request)++; // Skip -> "
     response->first = (ll)(*request);
@@ -30,10 +30,10 @@ Pair *parseJSONField(char **request)
     return response;
 }
 
-JSONData *parseJSONRow(char **request)
+json_data *parse_json_row(char **request)
 {
-    JSONData *response   = malloc(sizeof(JSONData));
-    response->field_name = parseJSONField(request);
-    response->field_val  = parseJSONField(request);
+    json_data *response   = malloc(sizeof(json_data));
+    response->field_name = parse_json_field(request);
+    response->field_val  = parse_json_field(request);
     return response;
 }

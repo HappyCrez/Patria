@@ -1,5 +1,5 @@
 #pragma once
-#include "Dependencies.h"
+#include "dependencies.h"
 
 #define HTTP_RESPONSE_HEADER_SIZE 147
 #define HTTP_RESPONSE_HEADER                    \
@@ -11,4 +11,4 @@
     "Connection: keep-alive\n\n"                  
 
 // Return actual HTTP header size OR -1
-Pair *createHTTPResponse(char* filename);
+struct pair *createHTTPResponse(char* filename);
