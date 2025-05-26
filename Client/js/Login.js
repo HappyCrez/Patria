@@ -24,8 +24,9 @@ const postData = async (url = "", data = {}) => {
 
 function login() {
     postData("/", {
-        username: username_login.value,
-        password: password_login.value,
+        "login": "True",
+        "username": username_login.value,
+        "password": password_login.value,
     }).then((data) => {
         console.log(data);
     });
@@ -34,6 +35,7 @@ function login() {
 
 login_submit.addEventListener("click", (event) => {
     login();
+    document.location.href="/Main.html";
 });
 
 document.addEventListener("keydown", (event) => {
@@ -41,4 +43,3 @@ document.addEventListener("keydown", (event) => {
         login();
     }
 });
-

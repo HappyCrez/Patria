@@ -1,9 +1,10 @@
 #include "FileHelper.h"
 #include "Algoritms.h"
 
-struct pair createHTTPResponse(char* filename)
+Pair *createHTTPResponse(char* filename)
 {
-    struct pair response = {0ll, 0ll};
+    Pair *response = malloc(sizeof(Pair));
+    memset(response, 0, sizeof(response));
 
     // Open the file in read mode
     FILE *fp = fopen(filename, "r");
@@ -51,8 +52,8 @@ struct pair createHTTPResponse(char* filename)
     }
     fclose(fp);
 
-    response.first = (ll)buffer;
-    response.second = HTTP_RESPONSE_HEADER_SIZE+file_size-1;
+    response->first = (ll)buffer;
+    response->second = HTTP_RESPONSE_HEADER_SIZE+file_size-1;
 
     return response;
 }
