@@ -52,3 +52,16 @@ struct bst_node *bst_search(struct bst *tree, struct pair *key);
  * @tree: ptr on struct bst
  */
 void bst_destroy(struct bst *tree);
+
+/**
+ * Print tree
+ * @node: ptr on struct node bst
+ */
+void postorder_traversal(struct bst_node *node);
+
+/**
+ * Delete node
+ * @root: ptr on root node
+ * @key: ptr on key
+ */
+struct bst_node *bst_delete_node(struct bst_node *root, struct pair *key);

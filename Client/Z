@@ -2,12 +2,46 @@
 <html>
 <head>
     <link rel="icon" type="image/png" href="assets/titleLogo.png"/>
-    <link rel="stylesheet" href="css/Main.css">
+    <link rel="stylesheet" href="css/Login.css">
+    <link rel="stylesheet" href="css/Messenger.css">
     <meta charset="utf-8">
     <title>Patria</title>
 </head>
 <body>
-    
+    <section id="login_page" class="page active_page">
+        <div class="main_container">
+            <div class="art_container">
+                <img src="assets/loginPageBG.jpg"/>
+            </div>
+            <div class="content_container">
+                <h1 id="header">Patria</h1>
+                
+                <hr class="patria_line">
+                
+                <div class="input_container">
+                    <label for="uname"><b>Электронная почта</b></label>
+                    <input id="username_login" type="text" name="uname" required>
+                </div>
+                
+                <div class="input_container">
+                    <label for="psw"><b>Пароль</b></label>
+                    <input id="password_login" type="password" name="psw" required>
+                </div>
+                
+                <button id="login_submit" type="submit">Войти</button>
+                <label>
+                    <input type="checkbox" checked="checked" name="remember"> Запомнить
+                </label>
+                
+                <span class="psw_reset"><a href="#">Я забыл/а свой пароль</a></span>
+            
+            </div>
+        </div>
+    </section>
+
+
+
+    <section id="messenger_page" class="page">
     <div class="main_container">
         <div id="bar_scroll" class="bar_side">
             <div class="search_container">
@@ -55,7 +89,7 @@
             </div>
         </div>
     </div>
+    </section>
 </body>
-<script src="js/Main.js"></script>
-
+<script src="js/Base.js"></script>
 </html>

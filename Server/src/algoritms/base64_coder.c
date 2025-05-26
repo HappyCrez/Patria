@@ -52,11 +52,13 @@ static base64 base64simple_encode_chars(base64 data)
         data.encoded[3] = encoding_table[(combined >> 0) & 0x3F];
 
         // Setting trailing chars '=' in accordance with base64 encoding standard
-        if (data.index == 1) {
+        if (data.index == 1)
+        {
                 data.encoded[2] = '=';
                 data.encoded[3] = '=';
         }
-        else if (data.index == 2) {
+        else if (data.index == 2)
+        {
                 data.encoded[3] = '=';
         }
 
@@ -81,43 +83,51 @@ static base64 base64simple_decode_chars(base64 data)
 
         // Change encoded chars to decimal index in encoding_table
         for (i = 0; i < 64; ++i)
-                if (data.encoded[0] == encoding_table[i]) {
+                if (data.encoded[0] == encoding_table[i])
+                {
                         data.encoded[0] = i;
                         ++f;
                         break;
                 }
         for (i = 0; i < 64; ++i)
-                if (data.encoded[1] == encoding_table[i]) {
+                if (data.encoded[1] == encoding_table[i])
+                {
                         data.encoded[1] = i;
                         ++f;
                         break;
                 }
         for (i = 0; i < 64; ++i)
-                if (data.encoded[2] == encoding_table[i]) {
+                if (data.encoded[2] == encoding_table[i])
+                {
                         data.encoded[2] = i;
                         ++f;
                         break;
                 }
-                else if (data.encoded[2] == '=') {
+                else if (data.encoded[2] == '=')
+                {
                         data.encoded[2] = 0;
 
                         // Make sure the next char is also a '='. Otherwise don't
                         // increment f and return an error below.
-                        if (data.encoded[3] == '=') {
+                        if (data.encoded[3] == '=')
+                        {
                                 --(data.index);
                                 ++f;
                         }
 
                         break;
                 }
-        for (i = 0; i < 64; ++i) {
+        for (i = 0; i < 64; ++i)
+        {
 
-                if (data.encoded[3] == encoding_table[i]) {
+                if (data.encoded[3] == encoding_table[i])
+                {
                         data.encoded[3] = i;
                         ++f;
                         break;
                 }
-                else if (data.encoded[3] == '=') {
+                else if (data.encoded[3] == '=')
+                {
                         data.encoded[3] = 0;
                         --(data.index);
                         ++f;
@@ -126,7 +136,8 @@ static base64 base64simple_decode_chars(base64 data)
         }
 
         // Verify all input chars were found, return with error if not
-        if (f < 4) {
+        if (f < 4)
+        {
                 data.error = 1;
                 return data;
         }
@@ -171,18 +182,22 @@ char *base64simple_encode(unsigned char *a, size_t s)
                 return NULL;
 
         // Loop over input string and encoding the contents
-        for (l = 0, i = 0; i < s; ++i) {
+        for (l = 0, i = 0; i < s; ++i)
+        {
                 contents.decoded[contents.index++] = a[i];
-                if (contents.index == BASE64_DECODED_COUNT) {
+                if (contents.index == BASE64_DECODED_COUNT)
+                {
                         contents = base64simple_encode_chars(contents);
-                        for (j = 0; j < BASE64_ENCODED_COUNT; ++j, ++l) {
+                        for (j = 0; j < BASE64_ENCODED_COUNT; ++j, ++l)
+                        {
                                 r[l] = contents.encoded[j];
                         }
                         r[l] = '\0';
                         contents.index = 0;
                 }
         }
-        if (contents.index > 0) {
+        if (contents.index > 0)
+        {
                 contents = base64simple_encode_chars(contents);
                 for (j = 0; j < BASE64_ENCODED_COUNT; ++j, ++l)
                 {
@@ -218,9 +233,11 @@ unsigned char *base64simple_decode(char *a, size_t s, size_t *rs)
                 return NULL;
 
         // Loop over input string and decoding the contents
-        for (l = 0, i = 0; i < s; ++i) {
+        for (l = 0, i = 0; i < s; ++i)
+        {
                 contents.encoded[contents.index++] = a[i];
-                if (contents.index == BASE64_ENCODED_COUNT) {
+                if (contents.index == BASE64_ENCODED_COUNT)
+                {
                         contents = base64simple_decode_chars(contents);
 
                         // Invalid encoding. Break out of loop.
@@ -242,10 +259,13 @@ unsigned char *base64simple_decode(char *a, size_t s, size_t *rs)
 
         // Return NULL if there was a decode error. Otherwise, return decoded
         // string and store its length.
-        if (contents.error) {
+        if (contents.error)
+        {
                 *rs = 0;
                 return NULL;
-        } else {
+        }
+        else
+        {
                 *rs = l;
                 return r;
         }

@@ -13,7 +13,7 @@ body
     --messages-block-max-width: 728px;
 }
 
-.main_container
+#messenger_page .main_container
 {
     display: flex;
     padding: 0;
@@ -23,7 +23,7 @@ body
     background-color: #fff;
 }
 
-.bar_side
+#messenger_page .bar_side
 {
     display: flex;
     flex-direction: column;
@@ -39,7 +39,7 @@ body
     color: #000;
 }
 
-.search
+#messenger_page .search
 {
     background-color: #ddd;
     padding: 8px 20px;
@@ -49,20 +49,20 @@ body
     height: 20px;
 }
 
-.bar_header
+#messenger_page .bar_header
 {
     padding: 20px 0 5px 0;
     margin: 0;
     align-self: center;
 }
 
-.patria_line
+#messenger_page .patria_line
 {
     width: 90%;
     margin-bottom: 10px;
 }
 
-.dialogs_container div
+#messenger_page .dialogs_container div
 {
     display: flex;
     flex-direction: row;
@@ -74,19 +74,19 @@ body
     padding: 12px;
 }
 
-.dialog img
+#messenger_page .dialog img
 {
     margin-right: 14px;
 }
 
-.active_dialog
+#messenger_page .active_dialog
 {
     color: #fff;
     background: var(--active-elements-bg-color);
 }
 
 /* Messages */
-.message_side
+#messenger_page .message_side
 {
     overflow: hidden;
     position: relative;
@@ -101,20 +101,20 @@ body
     background-image: url("../assets/mainBG.png");
 }
 
-.message_side img
+#messenger_page .message_side img
 {
     object-fit: cover;
     width: 100%;
     height: 100%;
 }
 
-.messages_content
+#messenger_page .messages_content
 {
     margin: 0 auto;
     max-width: var(--messages-block-max-width);
 }
 
-.messages
+#messenger_page .messages
 {
     display: flex;
     flex-direction: column;
@@ -126,7 +126,7 @@ body
     color: #fff;
 }
 
-.messages div
+#messenger_page .messages div
 {
     display: flex;
     flex-direction: column;
@@ -140,18 +140,18 @@ body
     border-radius: 16px;
 }
 
-.message_recv
+#messenger_page .message_recv
 {
     background-color: #444;
 }
 
-.message_send
+#messenger_page .message_send
 {
     align-self: flex-end;
     background-color: #8738ef;
 }
 
-.messages_content
+#messenger_page .messages_content
 {
     padding: 0;
     margin: 0 auto;
@@ -161,12 +161,12 @@ body
     height: 100%;
 }
 
-.time
+#messenger_page .time
 {
     align-self: flex-end;
 }
 
-.input_footer
+#messenger_page .input_footer
 {
     display: flex;
     flex-direction: row;
@@ -177,7 +177,7 @@ body
     bottom: 20px;
 }
 
-.input_container
+#messenger_page .input_container
 {
     display: flex;
     border-radius: 10px;
@@ -188,7 +188,7 @@ body
     margin: 10px;
 }
 
-.input_left_side
+#messenger_page .input_left_side
 {
     width: 20px;
     height: 100%;
@@ -197,7 +197,7 @@ body
     border-bottom-left-radius: 10px;
 }
 
-.input_right_side
+#messenger_page .input_right_side
 {
     width: 20px;
     height: 100%;
@@ -206,7 +206,7 @@ body
     border-bottom-right-radius: 10px;
 }
 
-#message_input
+#messenger_page #message_input
 {
     overflow: auto;
     resize: none;
@@ -226,26 +226,26 @@ body
 }
 
 /* Customizing the scrollbar for WebKit-based browsers */
-#message_input::-webkit-scrollbar {
+#messenger_page #message_input::-webkit-scrollbar {
     
     width: 6px; /* Width of the scrollbar */
 }
 
-#message_input::-webkit-scrollbar-track {
+#messenger_page #message_input::-webkit-scrollbar-track {
     right: 0;
     background: #f1f1f1; /* Background color of the track */
 }
 
-#message_input::-webkit-scrollbar-thumb {
+#messenger_page #message_input::-webkit-scrollbar-thumb {
     background: #888; /* Background color of the thumb */
     border-radius: 4px; /* Rounded corners for the thumb */
 }
 
-#message_input::-webkit-scrollbar-thumb:hover {
+#messenger_page #message_input::-webkit-scrollbar-thumb:hover {
     background: #555; /* Background color of the thumb on hover */
 }
 
-#message_submit
+#messenger_page #message_submit
 {
     border-radius: 50%;
     width: 56px;
@@ -258,7 +258,7 @@ body
     transition: all 0.2s;
 }
 
-#message_submit img
+#messenger_page #message_submit img
 {
     position: absolute;
     top:50%;
@@ -271,7 +271,7 @@ body
     height: 25px;
 }
 
-#message_submit:hover
+#messenger_page #message_submit:hover
 {
     color: #fff;
     background-color: #5594D4;

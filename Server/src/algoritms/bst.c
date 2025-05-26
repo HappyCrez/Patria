@@ -7,13 +7,33 @@ void bst_init(struct bst *tree, compare_func cmp_func)
 }
 
 /**
+ * Recursive realization bst_destroy
+ * @node: ptr struct bst
+ */
+static void bst_destroy_node(struct bst_node *node)
+{
+        if (!node)
+                return;
+
+        bst_destroy_node(node->left);
+        bst_destroy_node(node->right);
+        free(node);
+}
+
+void bst_destroy(struct bst *tree)
+{
+        bst_destroy_node(tree->root);
+        tree->root = NULL;
+}
+
+/**
  * Create and return new bst_node
  * @key: value
  * Return: ptr on new struct bst_node or NULL
  */
 static struct bst_node *bst_create_node(struct pair *key)
 {
-        struct bst_node *node = malloc(sizeof(*node));
+        struct bst_node *node = malloc(sizeof(struct bst_node));
         if (!node)
                 return NULL; /* Malloc error */
 
@@ -67,22 +87,42 @@ struct bst_node *bst_search(struct bst *tree, struct pair *key)
         return bst_search_node(tree->root, tree->cmp_func, key);
 }
 
-/**
- * Recursive realization bst_destroy
- * @node: ptr struct bst
- */
-static void bst_destroy_node(struct bst_node *node)
+void postorder_traversal(struct bst_node *node)
 {
         if (!node)
                 return;
 
-        bst_destroy_node(node->left);
-        bst_destroy_node(node->right);
-        free(node);
+        postorder_traversal(node->left);
+        postorder_traversal(node->right);
+        printf("%s\n", (char *)node->key->first);
 }
 
-void bst_destroy(struct bst *tree)
+struct bst_node *bst_delete_node(struct bst_node *root, struct pair *key)
 {
-        bst_destroy_node(tree->root);
-        tree->root = NULL;
+    struct bst_node *temp;
+
+    if (!root)
+        return NULL;
+
+    if (key < root->key) {
+        root->left = bst_delete_node(root->left, key);
+    } else if (key > root->key) {
+        root->right = bst_delete_node(root->right, key);
+    } else {
+        if (!root->left) {
+            temp = root->right;
+            free(root);
+            return temp;
+        } else if (!root->right) {
+            temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        temp = bst_min_node(root->right);
+        root->key = temp->key;
+        root->right = bst_delete_node(root->right, temp->key);
+    }
+
+    return root;
 }

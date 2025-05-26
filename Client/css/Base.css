@@ -17,6 +17,16 @@ a
     text-decoration: none;
 }
 
+.page
+{
+        display: none;
+}
+
+.active_page
+{
+        display: block;
+}
+
 button {
     background-color: #3881ef;
     color: white;

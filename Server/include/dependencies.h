@@ -41,6 +41,8 @@ struct server_response
 #define MAX_FILEPATH_SIZE 1000 // The most depeer files is more shorter than 1000 symbols
 #define PATH_TO_CLIENT_FILES_LEN 9
 #define PATH_TO_CLIENT_FILES "./Client"
+#define PATH_TO_SRC_FILE_LEN 11
+#define PATH_TO_SRC_FILE "./Client/Z"
 #define PATH_TO_STORAGE "./temp/storage.txt"
 
 // TCP connection

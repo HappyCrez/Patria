@@ -3,7 +3,7 @@
 
 struct ws_parser_callbacks {
     int(*on_data_begin)     (void*, enum ws_frame_type_t);
-    int(*on_data_payload)   (void*, const char*, size_t);
+    int(*on_data_payload)   (void*, char*, size_t);
     int(*on_data_end)       (void*);
     int(*on_control_begin)  (void*, enum ws_frame_type_t);
     int(*on_control_payload)(void*, const char*, size_t);

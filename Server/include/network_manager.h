@@ -11,8 +11,6 @@
         "Connection: Upgrade\n"              \
         "Sec-WebSocket-Accept: "
 
-#define STD_ANSWER {0x89, 0x05, 'H', 'e', 'l', 'l', 'o', '\0'}
-
 struct network_manager
 {
         server *server;

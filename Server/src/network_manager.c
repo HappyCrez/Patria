@@ -81,39 +81,31 @@ struct pair *serverStdURL(char *request)
         }
         request[url_size] = '\0';
 
-        int file_path_size = strlen(request) + PATH_TO_CLIENT_FILES_LEN - 1;
-        char *file_path = malloc(file_path_size * sizeof(char));
-        strcpy(file_path, PATH_TO_CLIENT_FILES);
-        strcpy(file_path + PATH_TO_CLIENT_FILES_LEN - 1, request);
-        file_path[file_path_size] = '\0';
-
-        // TODO::DELETE DEBUG
-        if (__DEBUG)
-        {
-                printf("file path: %s\n", file_path);
+        char *file_path;
+        if (request[url_size - 1] == '/')
+        { /* url to catalog "/" */
+                file_path = malloc(PATH_TO_SRC_FILE_LEN);
+                strcpy(file_path, PATH_TO_SRC_FILE);
         }
-
-        struct pair *response = NULL;
-        if (file_path_size - PATH_TO_CLIENT_FILES_LEN > 3) // Prevent from get files like / /. /..
+        else
         {
-                response = createHTTPResponse(file_path);
-
-                // TODO::Correct createHTTPResponse to return the header in any case
-                if ((char *)response->first == NULL)
-                {
-                        response->first = (ll)malloc(HTTP_RESPONSE_HEADER_SIZE * sizeof(char));
-                        strcpy((char *)response->first, HTTP_RESPONSE_HEADER);
-                        response->second = HTTP_RESPONSE_HEADER_SIZE;
-                }
+                file_path = malloc(strlen(request) + PATH_TO_CLIENT_FILES_LEN - 1 * sizeof(char));
+                strcpy(file_path, PATH_TO_CLIENT_FILES);
+                strcpy(file_path + PATH_TO_CLIENT_FILES_LEN - 1, request);
         }
-        return response;
+        return createHTTPResponse(file_path);
 }
 
-struct server_response serveWebSocketURL(char *request)
+struct pair *serveWebSocketURL(char *request)
 {
+        struct pair *response = NULL;
+
         // IF init connection
         char *guidkey = malloc(GUIDKEY_LEN * sizeof(char));
         char *key_field_val = strstr(request, WS_KEY_FIELD) + WS_KEY_FIELD_LEN;
+        if (key_field_val == NULL)
+                return response;
+
         strncpy(guidkey, key_field_val, WS_KEY_LEN);
         strcpy(guidkey + WS_KEY_LEN, GUID);
         guidkey[GUIDKEY_LEN] = '\0';
@@ -135,24 +127,27 @@ struct server_response serveWebSocketURL(char *request)
         free(sha1_code);
         free(key);
 
-        struct pair *data = malloc(sizeof(struct pair));
-        data->first = (ll)ws_response;
-        data->second = WS_HEADER_LEN + key_len + 2;
-        struct server_response response = {data, TRUE};
+        response = malloc(sizeof(struct pair));
+        response->first = (ll)ws_response;
+        response->second = WS_HEADER_LEN + key_len + 2;
         return response;
 }
 
 // Try to serve request
-struct server_response serveGetRequest(char *request)
+struct server_response *serveGetRequest(char *request)
 {
-        struct server_response response = {NULL, FALSE};
+        struct server_response *response = malloc(sizeof(struct server_response));
+        memset(response, 0, sizeof(response));
+
         switch (getURLType(request))
         {
         case STD_URL:
-                response.data = serverStdURL(request);
+                response->isWS = FALSE;
+                response->data = serverStdURL(request);
                 break;
         case WEB_SOCKET_URL:
-                response = serveWebSocketURL(request);
+                response->isWS = TRUE;
+                response->data = serveWebSocketURL(request);
                 break;
         }
         return response;
@@ -180,111 +175,14 @@ enum http_get_types getPostType(char **request)
         return type;
 }
 
-// Parse JSON file from client
-struct pair serveLoginPost(char **request)
-{
-        struct pair response = {0ll, 0ll};
-
-        // Now we have ptr to username and password
-        json_data *username = parse_json_row(request);
-        json_data *password = parse_json_row(request);
-
-        // TODO::Select data from database
-        free(username);
-        free(password);
-        return response;
-}
-
-struct pair serveRecvMessagesPost(char **request)
-{
-        struct pair response = {0ll, 0ll};
-
-        json_data *reciver = parse_json_row(request);
-        json_data *message = parse_json_row(request);
-
-        FILE *data_storage = fopen(PATH_TO_STORAGE, "a");
-        if (data_storage == NULL)
-        {
-                return response;
-        }
-        fputs((char *)reciver->field_val->first, data_storage);
-        fputs("\n", data_storage);
-        fputs((char *)message->field_val->first, data_storage);
-        fputs("\n", data_storage);
-        fclose(data_storage);
-
-        // TODO::INPUT data to database
-        // TODO::Update reciver side
-
-        response.first = (ll)malloc(HTTP_RESPONSE_HEADER_SIZE * sizeof(char));
-        strcpy((char *)response.first, HTTP_RESPONSE_HEADER);
-        response.second = HTTP_RESPONSE_HEADER_SIZE;
-
-        destroy_json_data(reciver);
-        destroy_json_data(message);
-
-        return response;
-}
-
-struct pair serveRecvDialogsPost(char **request)
-{
-        struct pair response = {0ll, 0ll};
-
-        json_data *sender = parse_json_row(request);
-        json_data *reciver = parse_json_row(request);
-
-        // TODO::Select data from database
-
-        destroy_json_data(sender);
-        destroy_json_data(reciver);
-        return response;
-}
-
-// Serve post request
-struct pair *servePostRequest(char *request)
-{
-        // TODO::SELECT INFO FROM FS OR DB TO SERVE CLIENT
-        // IT CAN BE LOGIN POST OR GET CHATS INFO
-
-        // Go to start of JSON Data
-        while (*request != '{' && *request != '\0')
-        {
-                request++;
-        }
-        request++; // Skip -> {
-
-        struct pair response = {0ll, 0ll};
-        switch (getPostType(&request))
-        {
-        case UNKNOWN_POST:
-                // Nothing to do
-                break;
-        case LOGIN_POST:
-                response = serveLoginPost(&request);
-                break;
-        case RECIVE_MESSAGES_POST:
-                response = serveRecvMessagesPost(&request);
-                break;
-        case RECIVE_DIALOGS_POST:
-                response = serveRecvDialogsPost(&request);
-                break;
-        }
-
-        // TODO::DELETE
-        struct pair *response_ret = malloc(sizeof(struct pair));
-        response_ret->first = response.first;
-        response_ret->first = response.second;
-        return response_ret;
-}
-
 struct pair serveWebSocket(struct web_socket_routine *ws_args, struct pair frame)
 {
         struct ws_parser parser;
         ws_parser_init(&parser);
-        int rc = ws_parser_execute(&parser, ws_args->network_manager->callbacks, &ws_args, (char *)frame.first, frame.second);
+        int rc = ws_parser_execute(&parser, ws_args->network_manager->callbacks, (void *)ws_args, (char *)frame.first, frame.second);
         if (rc != WS_OK)
         {
-                printf("web_socket parser: parsing failed: %d %s\n", rc, ws_parser_error(rc));
+                printf("web_socket parser failed: %d %s\n", rc, ws_parser_error(rc));
         }
 }
 
@@ -311,7 +209,6 @@ void *serveConnection(void *arg)
         }
         close(client_info->second);
         // TODO::Delete element from bst
-        free(ws_args->network_manager);
         free(ws_args);
         pthread_exit(0);
 }
@@ -335,44 +232,49 @@ void network_manager_accept_connection(struct network_manager *network_manager)
                 request[read_len] = '\0';
 
                 // server request
-                struct server_response response = {NULL, FALSE};
+                struct server_response *response = NULL;
+
                 switch (getRequestType(request))
                 {
                 case GET_REQUEST:
                         response = serveGetRequest(request);
                         break;
-                case POST_REQUEST:
-                        response.data = servePostRequest(request);
+                case POST_REQUEST: // SERVER DON'T ANSWER ON POST REQUESTS
+                        response = malloc(sizeof(response));
+                        response->isWS = FALSE;
+                        response->data = response_http_404();
                         break;
                 case UNKNOWN_REQUEST:
                         printf("UNKNOWN REQUEST\n");
                         break;
                 }
 
-                if (response.data && response.data->first) // When server can provide response
+                if (response->data && response->data->first) // When server can provide response
                 {
-                        send(client_socket, (char *)response.data->first, response.data->second, 0);
-                        free((char *)response.data->first);
-                        free((char *)response.data);
+                        send(client_socket, (char *)response->data->first, response->data->second, 0);
+                        free((char *)response->data->first);
+                        free((char *)response->data);
                 }
 
-                if (response.isWS) // if WebSocket then create new thread
+                if (!response->isWS)
                 {
-                        struct web_socket_routine *ws_args = malloc(sizeof(struct web_socket_routine));
-                        pthread_t thread_id;
-
-                        // Fill struct fields
-                        ws_args->network_manager = network_manager;
-                        ws_args->client_info = malloc(sizeof(struct pair));
-                        ws_args->client_info->first = (ll)NULL;
-                        ws_args->client_info->second = client_socket;
-                        ws_args->pthread = &thread_id;
-
-                        pthread_create(&thread_id, NULL, serveConnection, (void *)ws_args);
-                        pthread_detach(thread_id);
+                        close(client_socket); // close connection
                         continue;
                 }
-                close(client_socket); // Else close connection
+
+                /* On WebSocket -> create new thread */
+                struct web_socket_routine *ws_args = malloc(sizeof(struct web_socket_routine));
+                pthread_t thread_id;
+
+                // Fill struct fields
+                ws_args->network_manager = network_manager;
+                ws_args->client_info = malloc(sizeof(struct pair));
+                ws_args->client_info->first = (ll)NULL;
+                ws_args->client_info->second = client_socket;
+                ws_args->pthread = &thread_id;
+
+                pthread_create(&thread_id, NULL, serveConnection, (void *)ws_args);
+                pthread_detach(thread_id);
         }
         free(request);
 }
