@@ -48,31 +48,17 @@
                 <input id="search_bar" class="search" type="text" placeholder="search"/>
             </div>
             <div id="dialogs_container">
-                <div id="Vladimir" class="dialog active_dialog">
-                    <img src="assets/avatar.png"/>
-                    Vladimir
-                </div>
-                <div id="Ivan" class="dialog">
-                    <img src="assets/avatar.png"/>
-                    Ivan
-                </div>
+
+                <!-- Add dialogs  -->
+
             </div>
         </div>
         <div class="message_side">
             <div class="messages_content">
                 <div id="messages_container" class="messages">
-                    <div class="message_recv">
-                        Very long text with examples and many lines so it should be wrapped by some automatic div algoritm
-                    <sub class="time">23:10</sub>
-                </div>
-                <div class="message_send">
-                    Very long text with examples and many lines so it should be wrapped by some automatic div algoritm
-                    <sub class="time">23:10</sub>
-                </div>
-                <div class="message_send">
-                    New message
-                    <sub class="time">23:10</sub>
-                </div>
+                    
+                    <!-- Add messages -->
+                
                 </div>
                 <div class="input_footer">
                     <div class="input_container">

@@ -55,13 +55,12 @@ static struct bst_node *bst_insert_node(struct bst_node *node, struct pair *data
         else if (strcmp((char *)data->first, node->key) > 0)
                 node->right = bst_insert_node(node->right, data);
                 
-        /* if key in already in the tree -> return this node to update its value */
+        /* if key in already in the tree -> do nothing */
         return node;
 }
 
 struct bst_node *bst_insert(struct bst *tree, struct pair *data)
 {
-        /* If bst already has node this data->first key, then update it value */
         struct bst_node *node = bst_insert_node(tree->root, data);
 
         if (!tree->root)
@@ -89,14 +88,14 @@ struct bst_node *bst_search(struct bst *tree, char *key)
         return bst_search_node(tree->root, key);
 }
 
-void postorder_traversal(struct bst_node *node)
+void bst_postorder_traversal(struct bst_node *node)
 {
         if (!node)
                 return;
 
-        postorder_traversal(node->left);
-        postorder_traversal(node->right);
-        printf("%s\n", (char *)node->key);
+        bst_postorder_traversal(node->left);
+        bst_postorder_traversal(node->right);
+        printf("%s : %d\n", (char *)node->key, node->val);
 }
 
 /* Find last left node in tree */

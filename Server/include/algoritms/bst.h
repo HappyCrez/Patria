@@ -36,7 +36,7 @@ void bst_init(struct bst *tree);
  * Insert pair {key,val} in bst
  * @tree: ptr on struct bst
  * @data: pair {key,value}
- * Return: ptr on new bst_node or NULL
+ * Return: ptr on root or NULL
  */
 struct bst_node *bst_insert(struct bst *tree, struct pair *data);
 
@@ -58,7 +58,7 @@ void bst_destroy(struct bst *tree);
  * Print tree
  * @node: ptr on struct node bst
  */
-void postorder_traversal(struct bst_node *node);
+void bst_postorder_traversal(struct bst_node *node);
 
 /**
  * Delete node

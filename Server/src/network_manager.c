@@ -176,7 +176,7 @@ enum http_get_types getPostType(char **request)
         {
                 type = RECIVE_DIALOGS_POST;
         }
-        destroy_json_data(post_type);
+        json_data_destroy(post_type);
         return type;
 }
 
@@ -272,9 +272,10 @@ void network_manager_accept_connection(struct network_manager *network_manager)
                         free((char *)response->data);
                 }
 
+                /* On Http request after answer -> close connection */
                 if (!response->isWS)
                 {
-                        close(client_socket); // close connection
+                        close(client_socket);
                         continue;
                 }
 

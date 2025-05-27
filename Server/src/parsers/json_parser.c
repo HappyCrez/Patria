@@ -1,12 +1,12 @@
 #include "parsers/json_parser.h"
 
-void init_json_data(json_data *ptr, struct pair *field_name, struct pair *field_val)
+void json_data_init(json_data *ptr, struct pair *field_name, struct pair *field_val)
 {
     ptr->field_name = field_name;
     ptr->field_val = field_val;
 }
 
-void destroy_json_data(json_data *ptr)
+void json_data_destroy(json_data *ptr)
 {
     free(ptr->field_name);
     free(ptr->field_val);
