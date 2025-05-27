@@ -91,8 +91,8 @@ enum http_post_types
 
 // WEB SOCKET (WS)
 #define WS_KEY_LEN 24
-#define WS_KEY_FIELD_LEN 19
-#define WS_KEY_FIELD "Sec-WebSocket-Key:"
+#define WS_KEY_FIELD_LEN 20
+#define WS_KEY_FIELD "Sec-WebSocket-Key: "
 
 #define GUID_LEN 37
 #define GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"

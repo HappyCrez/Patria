@@ -9,7 +9,7 @@ struct pair *response_http_404()
         return response;
 }
 
-struct pair *createHTTPResponse(char *filename)
+struct pair *create_http_response(char *filename)
 {
         if (strstr(filename, "/.") != NULL)
         {

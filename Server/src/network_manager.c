@@ -8,6 +8,8 @@
 #include "file_helper.h"
 #include "server.h"
 
+#include "parsers/web_socket_builder.h"
+
 int network_manager_init(struct network_manager *network_manager, struct server *server)
 {
         network_manager->server = server;
@@ -94,43 +96,45 @@ struct pair *serverStdURL(char *request)
                 strcpy(file_path, PATH_TO_CLIENT_FILES);
                 strcpy(file_path + PATH_TO_CLIENT_FILES_LEN - 1, request);
         }
-        return createHTTPResponse(file_path);
+        return create_http_response(file_path);
 }
 
+// IF init connection
 struct pair *serveWebSocketURL(char *request)
 {
         struct pair *response = NULL;
-
-        // IF init connection
         char *guidkey = malloc(GUIDKEY_LEN * sizeof(char));
-        char *key_field_val = strstr(request, WS_KEY_FIELD) + WS_KEY_FIELD_LEN;
+        memset(guidkey, 0, GUID_LEN);
+        char *key_field_val = strstr(request, WS_KEY_FIELD) + WS_KEY_FIELD_LEN-1;
         if (key_field_val == NULL)
                 return response;
 
         strncpy(guidkey, key_field_val, WS_KEY_LEN);
-        strcpy(guidkey + WS_KEY_LEN, GUID);
-        guidkey[GUIDKEY_LEN] = '\0';
+        guidkey[WS_KEY_LEN] = '\0';
+        strcat(guidkey, GUID);
 
         unsigned char *sha1_code = malloc(SHA_DIGEST_LENGTH * sizeof(char));
         SHA1(guidkey, GUIDKEY_LEN - 1, sha1_code);
 
         char *key = base64simple_encode(sha1_code, strlen(sha1_code));
         int key_len = strlen(key);
-        char *ws_response = malloc(WS_HEADER_LEN + key_len + 2 * sizeof(char));
 
-        strcpy(ws_response, WS_HEADER);
-        strcpy(ws_response + WS_HEADER_LEN - 1, key);
-        ws_response[WS_HEADER_LEN + key_len - 1] = '\n';
-        ws_response[WS_HEADER_LEN + key_len] = '\n';
-        ws_response[WS_HEADER_LEN + key_len + 1] = '\0';
+        #define END_SEQUENCE_LEN 3
+        #define END_SEQUENCE "\n\n"
+        
+        response = malloc(sizeof(struct pair));
+        response->second = WS_HEADER_LEN + key_len + END_SEQUENCE_LEN - 2;
+        response->first = (ll)malloc(response->second * sizeof(char));
+
+        strcpy((char *)response->first, WS_HEADER);
+        strcpy((char *)response->first + WS_HEADER_LEN - 1, key);
+        strcpy((char *)response->first + WS_HEADER_LEN + key_len - 1, END_SEQUENCE);
+        ((char *)response->first)[WS_HEADER_LEN + key_len + END_SEQUENCE_LEN - 2] = '\0';
 
         free(guidkey);
         free(sha1_code);
         free(key);
 
-        response = malloc(sizeof(struct pair));
-        response->first = (ll)ws_response;
-        response->second = WS_HEADER_LEN + key_len + 2;
         return response;
 }
 
@@ -197,7 +201,6 @@ void *serveConnection(void *arg)
         while (TRUE)
         {
                 frame.second = recv(client_info->second, (char *)frame.first, MAX_REQUEST_SIZE, 0);
-
                 if (frame.second <= 0)
                 {
                         printf("ID: %lld is disconnected\n", client_info->second);
@@ -255,6 +258,10 @@ void network_manager_accept_connection(struct network_manager *network_manager)
                         break;
                 case UNKNOWN_REQUEST:
                         printf("UNKNOWN REQUEST\n");
+                        printf("\n=================\n%s\n===================\n", request);
+                        response = malloc(sizeof(response));
+                        response->isWS = FALSE;
+                        response->data = response_http_404();
                         break;
                 }
 
@@ -273,7 +280,7 @@ void network_manager_accept_connection(struct network_manager *network_manager)
 
                 /* On WebSocket -> create new thread */
                 struct web_socket_routine *ws_args = malloc(sizeof(struct web_socket_routine));
-                pthread_t thread_id;
+                pthread_t *thread_id = malloc(sizeof(pthread_t));
 
                 // Fill struct fields
                 ws_args->mutex = &network_manager->mutex;
@@ -282,10 +289,12 @@ void network_manager_accept_connection(struct network_manager *network_manager)
                 ws_args->client_info = malloc(sizeof(struct pair));
                 ws_args->client_info->first = (ll)NULL;
                 ws_args->client_info->second = client_socket;
-                ws_args->pthread = &thread_id;
+                ws_args->pthread = thread_id;
 
-                pthread_create(&thread_id, NULL, serveConnection, (void *)ws_args);
-                pthread_detach(thread_id);
+                printf("ID: %d is connected\n", client_socket);
+
+                pthread_create(thread_id, NULL, serveConnection, (void *)ws_args);
+                pthread_detach(*thread_id);
         }
         free(request);
 }

@@ -15,4 +15,4 @@
 
 // Return actual HTTP header size OR -1
 struct pair *response_http_404();
-struct pair *createHTTPResponse(char *filename);
+struct pair *create_http_response(char *filename);

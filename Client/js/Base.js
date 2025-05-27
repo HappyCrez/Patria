@@ -9,7 +9,9 @@ function connectToServer() {
         };
 
         socket.onmessage = (event) => {
-            console.log(event.data);
+
+            appendMessage(event.data, false);
+
         }
 
         socket.onerror = (event) => {
@@ -68,8 +70,7 @@ function setPageState(new_state) {
 
 setup();
 function setup() {
-    setPageState(state.LOGIN_PAGE);
-    connectToServer();
+    setPageState(states.LOGIN_PAGE);
 }
 
 document.addEventListener('keydown', (event) => {
@@ -94,6 +95,10 @@ document.addEventListener('click', (event) => {
     }
 });
 
+window.onload = function() {
+    connectToServer();
+};
+
 /*              Login page               */
 const username_login = document.getElementById('username_login');
 const password_login = document.getElementById('password_login');
@@ -106,7 +111,7 @@ const options = {
 
 function loginPageOnKeyDown(event) {
     if (socket) {
-        if (!event.shiftKey && event.key == 'Enter') {
+        if (event.key == 'Enter') {
             login();
         }
     }
@@ -118,7 +123,13 @@ login_submit.addEventListener("click", (event) => {
     }
 });
 
+const regex = /^[a-zA-Z0-9]+$/;
+
 function login() {
+    if (regex.test(username_login.value) == false) {
+        console.log("Login is incorrect");
+        return;
+    }
     wsSend('{"login":"True","username":"' + username_login.value + '","password":"' + password_login.value + '"}');
 
     // TODO::Listen server to sync dialogs and messages

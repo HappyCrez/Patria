@@ -13,7 +13,8 @@ SRC = 							\
 	src/file_helper.c 				\
 	src/web_socket_handler.c			\
 	src/parsers/json_parser.c 			\
-	src/parsers/web_socket_parser.c	
+	src/parsers/web_socket_parser.c			\
+	src/parsers/web_socket_builder.c
 
 INCLUDE = \
 	include/

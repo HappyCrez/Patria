@@ -30,14 +30,14 @@ void bst_destroy(struct bst *tree)
  * @key: value
  * Return: ptr on new struct bst_node or NULL
  */
-static struct bst_node *bst_create_node(struct pair data)
+static struct bst_node *bst_create_node(struct pair *data)
 {
         struct bst_node *node = malloc(sizeof(struct bst_node));
         if (!node)
                 return NULL; /* Malloc error */
 
-        node->key = (char *)data.first;
-        node->val = data.second;
+        node->key = (char *)data->first;
+        node->val = data->second;
         node->left = NULL;
         node->right = NULL;
 
@@ -45,15 +45,15 @@ static struct bst_node *bst_create_node(struct pair data)
 }
 
 /* Recursive realization -> bst_insert */
-static struct bst_node *bst_insert_node(struct bst_node *node, char *key)
+static struct bst_node *bst_insert_node(struct bst_node *node, struct pair *data)
 {
         if (!node)
-                return bst_create_node((struct pair){(ll)key,0ll});
+                return bst_create_node(data);
 
-        if (strcmp(key, node->key) < 0)
-                node->left = bst_insert_node(node->left, key);
-        else if (strcmp(key, node->key) > 0)
-                node->right = bst_insert_node(node->right, key);
+        if (strcmp((char *)data->first, node->key) < 0)
+                node->left = bst_insert_node(node->left, data);
+        else if (strcmp((char *)data->first, node->key) > 0)
+                node->right = bst_insert_node(node->right, data);
                 
         /* if key in already in the tree -> return this node to update its value */
         return node;
@@ -62,8 +62,7 @@ static struct bst_node *bst_insert_node(struct bst_node *node, char *key)
 struct bst_node *bst_insert(struct bst *tree, struct pair *data)
 {
         /* If bst already has node this data->first key, then update it value */
-        struct bst_node *node = bst_insert_node(tree->root, (char *)data->first);
-        node->val = data->second; 
+        struct bst_node *node = bst_insert_node(tree->root, data);
 
         if (!tree->root)
                 tree->root = node;
