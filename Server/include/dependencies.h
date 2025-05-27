@@ -49,13 +49,15 @@ struct server_response
 #define SERVER_PORT 8080
 #define MAX_REQUEST_SIZE 8000 // HTTP specification recommend
 
-enum connection_error
+enum server_error
 {
         SUCCESS = 0,
         SOCKET_ERROR,
         BIND_ERROR,
         LISTEN_ERROR,
-        OPT_ERROR
+        OPT_ERROR,
+        ALLOCATION_ERROR,
+        JSON_FILE_INCORRECT
 };
 
 enum http_request
@@ -101,15 +103,6 @@ enum http_post_types
 #define SHA1_LEN 41
 #define BASE64_LEN 56
 
-enum ws_frame_type_t
-{
-        WS_FRAME_TEXT = 0x1,
-        WS_FRAME_BINARY = 0x2,
-        WS_FRAME_CLOSE = 0x8,
-        WS_FRAME_PING = 0x9,
-        WS_FRAME_PONG = 0xA,
-};
-
 enum ws_parser_error_codes
 {
         WS_OK,
@@ -118,5 +111,22 @@ enum ws_parser_error_codes
         WS_INVALID_CONTINUATION,
         WS_CONTROL_TOO_LONG,
         WS_NON_CANONICAL_LENGTH,
-        WS_FRAGMENTED_CONTROL
+        WS_FRAGMENTED_CONTROL,
+        WS_INVALID_DATA
+};
+
+enum websocket_flags
+{
+        // opcodes
+        WS_OP_CONTINUE = 0x0,
+        WS_OP_TEXT = 0x1,
+        WS_OP_BINARY = 0x2,
+        WS_OP_CLOSE = 0x8,
+        WS_OP_PING = 0x9,
+        WS_OP_PONG = 0xA,
+        WS_OP_MASK = 0xF,
+        
+        // marks
+        WS_FINAL_FRAME = 0x10,
+        WS_HAS_MASK = 0x20,
 };

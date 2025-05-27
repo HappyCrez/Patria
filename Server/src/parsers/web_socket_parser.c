@@ -74,7 +74,7 @@ int ws_parser_execute(
                         }
                         else if (opcode & 0x8)
                         { // control
-                                if (opcode != WS_FRAME_PING && opcode != WS_FRAME_PONG && opcode != WS_FRAME_CLOSE)
+                                if (opcode != WS_OP_PING && opcode != WS_OP_PONG && opcode != WS_OP_CLOSE)
                                 {
                                         return WS_INVALID_OPCODE;
                                 }
@@ -97,7 +97,7 @@ int ws_parser_execute(
                         }
                         else
                         { // data
-                                if (opcode != WS_FRAME_TEXT && opcode != WS_FRAME_BINARY)
+                                if (opcode != WS_OP_TEXT && opcode != WS_OP_BINARY)
                                 {
                                         return WS_INVALID_OPCODE;
                                 }

@@ -34,3 +34,10 @@ uninstall:
 
 clean:
 	echo clean
+
+# Think about testing the app
+TEST_SRC = 				\
+	tests/test_json_parser.c 	
+
+test:
+	gcc -o tester $(SRC) $(TEST_SRC) -I $(INCLUDE) -lssl -lcrypto

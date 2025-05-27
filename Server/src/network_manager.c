@@ -158,28 +158,6 @@ struct server_response *serveGetRequest(char *request)
         return response;
 }
 
-enum http_get_types getPostType(char **request)
-{
-        enum http_get_types type = UNKNOWN_POST;
-
-        json_data *post_type = parse_json_row(request);
-
-        if (strstr((char *)post_type->field_name->first, HTTP_POST_LOGIN))
-        {
-                type = LOGIN_POST;
-        }
-        else if (strstr((char *)post_type->field_name->first, HTTP_POST_RECV_MESSAGES))
-        {
-                type = RECIVE_MESSAGES_POST;
-        }
-        else if (strstr((char *)post_type->field_name->first, HTTP_POST_RECV_DIALOGS))
-        {
-                type = RECIVE_DIALOGS_POST;
-        }
-        json_data_destroy(post_type);
-        return type;
-}
-
 struct pair serveWebSocket(struct web_socket_routine *ws_info, struct pair frame)
 {
         struct ws_parser parser;

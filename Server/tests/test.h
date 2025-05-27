@@ -1,0 +1,2 @@
+#define TEST_SUCCESS 0
+#define TEST_FAILED 1

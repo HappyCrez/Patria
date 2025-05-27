@@ -134,7 +134,6 @@ body
     flex-direction: column;
 
     position: relative;
-    transition: top 0.1s;
 
     height: auto;
     color: #fff;
