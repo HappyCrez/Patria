@@ -126,14 +126,13 @@ int on_control_begin(void *user_data, enum websocket_flags frame_type)
                frame_type == WS_OP_PING ? "ping" : frame_type == WS_OP_PONG ? "pong"
                                                : frame_type == WS_OP_CLOSE  ? "close"
                                                                             : "?");
-        if (frame_type != WS_OP_CLOSE)
+        if (frame_type == WS_OP_CLOSE)
         {
-                return WS_OK;
+                struct web_socket_routine *ws_info = (struct web_socket_routine *)user_data;
+                char reason[] = {0x03, 0xE8, 'c', 'l', 'o', 's', 'e', '\0'};
+                struct pair *close_frame = web_socket_build_frame(WS_OP_CLOSE | WS_FINAL_FRAME, reason, strlen(reason));
+                send(ws_info->client_info->second, (char *)close_frame->first, close_frame->second, MSG_NOSIGNAL);
         }
-        struct web_socket_routine *ws_info = (struct web_socket_routine *)user_data;
-        char reason[] = "Correct close";
-        struct pair *close_frame = web_socket_build_frame(WS_OP_CLOSE | WS_FINAL_FRAME, reason, strlen(reason));
-        send(ws_info->client_info->second, (char *)close_frame->first, close_frame->second, MSG_NOSIGNAL);
         return WS_OK;
 }
 

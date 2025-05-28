@@ -2,8 +2,8 @@
 <html>
 <head>
     <link rel="icon" type="image/png" href="assets/titleLogo.png"/>
-    <link rel="stylesheet" href="css/Login.css">
-    <link rel="stylesheet" href="css/Messenger.css">
+    <link rel="stylesheet" href="css/LoginPage.css">
+    <link rel="stylesheet" href="css/MessengerPage.css">
     <meta charset="utf-8">
     <title>Patria</title>
 </head>

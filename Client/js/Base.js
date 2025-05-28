@@ -2,43 +2,51 @@
 const MIN_DELAY = 1000
 let socket;
 let connection_delay = MIN_DELAY;
+
+let connection_faild_cnt = 0;
+const MAXIMUM_CONNECTION_TRYES = 2;
+
 function connectToServer() {
     try {
         socket = new WebSocket("ws://127.0.0.1:8080/WebSocket");
         socket.onopen = () => {
-            console.log("Connected");
+            //console.log("Connected");
+
+            // Drop connection "onfaild" options
             connection_delay = MIN_DELAY;
+            connection_faild_cnt = 0;
         };
 
         socket.onmessage = (event) => {
             json = JSON.parse(event.data);
 
             if (json.search_login) {
-                console.log("search:" + json.search_login);
-                appendDialog(json.search_login);
+                //console.log("search:" + json.search_login);
+                createDialog(json.search_login);
             } else if (json.send_message) {
                 json.send_message = json.send_message.replace(/\n/g, '<br>');
                 appendMessage(json.sender_login, json.send_message, false);
 
             } else if (json.login) {
                 if (json.login == "SUCCESS") {
-                    messengerPageSetup(event.data); // If login success sync data
+                    messengerPageSetup(); // If login success sync data
                 } else {
-                    console.log("Access denied");
+                    //console.log("Access denied");
                 }
             }
         }
 
         socket.onclose = (event) => {
-            console.log(event);
+            setPageState(login_page);
         }
 
         socket.onerror = (event) => {
-            console.log("Connection failed, try again in " + connection_delay / 1000);
-            setTimeout(function () {
-                connectToServer();
-            }, connection_delay);
+            location.reload();
+
+            //console.log("Connection failed, try again in " + connection_delay / 1000);
+            setTimeout(connectToServer, connection_delay);
             connection_delay *= 2;
+            connection_faild_cnt++;
         };
     } catch (e) { }
 }
@@ -54,19 +62,19 @@ function formatData(data) {
 
 function wsSend(data) {
     if (socket.readyState !== WebSocket.OPEN) {
-        console.log("Not connected!"); // Show on interface
+        //console.log("Not connected!"); // Show on interface
         return;
     }
     else {
         // Send data
-        console.log(data);
+        //console.log(data);
         socket.send(data);
     }
 }
 
 /*              Base logick               */
-const login_page = document.getElementById("login_page");
-const messenger_page = document.getElementById("messenger_page");
+const login_page = document.getElementById('login_page');
+const messenger_page = document.getElementById('messenger_page');
 
 page_list = [login_page, messenger_page];
 const states = {
@@ -127,7 +135,7 @@ window.onload = function () {
 }
 
 window.onbeforeunload = function () {
-    console.log("smthng");
+    //console.log("smthng");
     if (socket && socket.readyState === WebSocket.OPEN) {
         socket.close(1000, "Page unloaded");
     }
@@ -157,9 +165,10 @@ const regex = /^[a-zA-Z0-9]+$/;
 
 function login() {
     if (regex.test(username_login.value) == false) {
-        console.log("Login is incorrect");
+        //console.log("Login is incorrect");
         return;
     }
+    client_login = username_login.value;
     wsSend('{"login": "' + username_login.value + '", "password": "' + password_login.value + '"}');
 }
 
@@ -171,31 +180,51 @@ const message_input = document.getElementById('message_input');
 
 const dialogs = new Map();
 const dialogs_container = document.getElementById('dialogs_container');
-let reciver = null;
 
-function messengerPageSetup(data) {
+const self_chat = "Saved Messages";
+let client_login = null;
+let reciver = self_chat;
+let self_dialog_div = createDialog(self_chat);
+
+function messengerPageSetup(json) {
     setPageState(states.MESSENGER_PAGE);
+    dialogs_container.innerHTML = '';
+    messages.innerHTML = '';
+
+    addDialog(self_dialog_div);
+    setActiveDialog(self_dialog_div);
 }
 
-function appendDialog(login) {
+function addDialog(dialog_div) {
+    dialogs_container.appendChild(dialog_div);
+    dialogs.set(dialog_div.id, []);
+}
+
+function createDialog(login, path_to_image = 'assets/avatar.png"/') {
+    if (login == null)
+        return;
+
+    // Chat with client_login names as "Saved Messages"
+    if (login == client_login)
+        login = self_chat;
+
     for (element of dialogs_container.children) {
 
-        /* Dialog with gived login exists*/
-        if (element.id == login) return;
+        // Dialog with gived login exists
+        if (element.id == login)
+            return;
     }
     let dialog = document.createElement('div');
     dialog.classList.add('dialog');
     dialog.id = login;
 
-    let path_to_image = 'assets/avatar.png"/';
     dialog.innerHTML = '<img src="' + path_to_image + '">' + login;
-
-    dialogs_container.appendChild(dialog);
-    dialogs.set(login, []);
+    return dialog;
 }
 
 function appendMessage(login, message, isSend) {
     let message_div = document.createElement('div');
+
     if (isSend)
         message_div.classList.add('message_send');
     else
@@ -213,8 +242,9 @@ function appendMessage(login, message, isSend) {
 }
 
 function dialogsAddMessage(login, message_div) {
+    // If dialog not exists just add
     if (dialogs.has(login) == false) {
-        appendDialog(login);
+        addDialog(createDialog(login));
     }
     dialogs.get(login).push(message_div);
     messages.appendChild(message_div);
@@ -226,9 +256,14 @@ message_submit.addEventListener('click', (event) => {
 
 function sendMessage() {
     message = formatMessage(message_input.value);
-    if (message_input.value.length <= 0 || reciver == "") return;
+    if (message_input.value.length <= 0 || reciver == "") {
+        return;
+    }
 
-    wsSend('{"send_message": "' + reciver + '", "message": "' + formatData(message) + '"}');
+    // In this version all self messages don't send on server
+    if (reciver != self_chat) {
+        wsSend('{"send_message": "' + reciver + '", "message": "' + formatData(message) + '"}');
+    }
 
     message = message.replace(/\n/g, '<br>');
     appendMessage(reciver, message, true)
@@ -268,7 +303,9 @@ message_input.addEventListener('input', (event) => {
 });
 
 search_bar.addEventListener('input', (event) => {
-    if (search_bar.value.length < 1) return;
+    if (search_bar.value.length < 1) {
+        return;
+    }
     wsSend('{"search_login": "' + search_bar.value + '"}');
     return;
 });
@@ -297,6 +334,7 @@ function setActiveDialog(dialog) {
         element.classList.remove('active_dialog');
     }
     dialog.classList.add('active_dialog');
+    setDialogHistory(dialogs.get(dialog.id));
 }
 
 function messengerPageOnClick(event) {
@@ -304,5 +342,4 @@ function messengerPageOnClick(event) {
         return;
     reciver = event.srcElement.id;
     setActiveDialog(event.srcElement);
-    setDialogHistory(dialogs.get(event.srcElement.id));
 }
