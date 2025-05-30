@@ -22,7 +22,7 @@ function connectToServer() {
 
             if (json.search_login) {
                 //console.log("search:" + json.search_login);
-                createDialog(json.search_login);
+                addDialog(createDialog(json.search_login));
             } else if (json.send_message) {
                 json.send_message = json.send_message.replace(/\n/g, '<br>');
                 appendMessage(json.sender_login, json.send_message, false);
@@ -247,7 +247,10 @@ function dialogsAddMessage(login, message_div) {
         addDialog(createDialog(login));
     }
     dialogs.get(login).push(message_div);
-    messages.appendChild(message_div);
+    if (reciver == login)
+    {
+        messages.appendChild(message_div);
+    }
 }
 
 message_submit.addEventListener('click', (event) => {

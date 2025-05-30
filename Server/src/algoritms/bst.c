@@ -50,9 +50,9 @@ static struct bst_node *bst_insert_node(struct bst_node *node, struct pair *data
         if (!node)
                 return bst_create_node(data);
 
-        if (strcmp((char *)data->first, node->key) < 0)
+        if (strcmp(node->key, (char *)data->first) < 0)
                 node->left = bst_insert_node(node->left, data);
-        else if (strcmp((char *)data->first, node->key) > 0)
+        else if (strcmp(node->key, (char *)data->first) > 0)
                 node->right = bst_insert_node(node->right, data);
                 
         /* if key in already in the tree -> do nothing */
@@ -74,10 +74,10 @@ static struct bst_node *bst_search_node(struct bst_node *node, char *key)
         if (!node)
                 return NULL;
 
-        if (strcmp(key, node->key) == 0)
+        if (strcmp(node->key, key) == 0)
                 return node;
 
-        if (strcmp(key, node->key) < 0)
+        if (strcmp(node->key, key) < 0)
                 return bst_search_node(node->left, key);
 
         return bst_search_node(node->right, key);
