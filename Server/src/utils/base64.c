@@ -1,4 +1,4 @@
-#include "algoritms/base64_coder.h"
+#include "utils/base64.h"
 
 #define BASE64_ENCODED_COUNT 4
 #define BASE64_DECODED_COUNT 3
@@ -26,13 +26,13 @@ static char encoding_table[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
                                 'w', 'x', 'y', 'z', '0', '1', '2', '3',
                                 '4', '5', '6', '7', '8', '9', '+', '/'};
 /*
- * The base64simple_encode_chars() function encodes the characters stored
+ * The base64_encode_chars() function encodes the characters stored
  * in the decoded[] character array member of the base64 structure. Only
  * the number of characters specified by index will be encoded. Encoded
  * characters are stored in the encoded[] character array member of the
  * returned base64 structure.
  */
-static base64 base64simple_encode_chars(base64 data)
+static base64 base64_encode_chars(base64 data)
 {
         uint32_t octet_1, octet_2, octet_3;
         uint32_t combined = 0;
@@ -66,12 +66,12 @@ static base64 base64simple_encode_chars(base64 data)
 }
 
 /*
- * The base64simple_decode_chars() function decodes the characters stored
+ * The base64_decode_chars() function decodes the characters stored
  * in the encoded[] character array member of the base64 structure. Decoded
  * characters are stored in the decoded[] character array member of the
  * returned base64 structure.
  */
-static base64 base64simple_decode_chars(base64 data)
+static base64 base64_decode_chars(base64 data)
 {
         size_t i, f = 0;
         uint32_t octet_1, octet_2, octet_3, octet_4;
@@ -159,13 +159,13 @@ static base64 base64simple_decode_chars(base64 data)
 }
 
 /*
- * This function is a simple interface for the base64simple_encode_chars()
+ * This function is a simple interface for the base64_encode_chars()
  * function defined above. Client programs are meant to use this function
- * instead of using base64simple_encode_chars() directly. It takes a pointer
+ * instead of using base64_encode_chars() directly. It takes a pointer
  * to a character array and the array size, and returns a pointer to a
  * null-terminated string containing the encoded result.
  */
-char *base64simple_encode(unsigned char *a, size_t s)
+char *base64_encode(unsigned char *a, size_t s)
 {
         size_t i, j, l;
         base64 contents = {.index = 0};
@@ -187,7 +187,7 @@ char *base64simple_encode(unsigned char *a, size_t s)
                 contents.decoded[contents.index++] = a[i];
                 if (contents.index == BASE64_DECODED_COUNT)
                 {
-                        contents = base64simple_encode_chars(contents);
+                        contents = base64_encode_chars(contents);
                         for (j = 0; j < BASE64_ENCODED_COUNT; ++j, ++l)
                         {
                                 r[l] = contents.encoded[j];
@@ -198,7 +198,7 @@ char *base64simple_encode(unsigned char *a, size_t s)
         }
         if (contents.index > 0)
         {
-                contents = base64simple_encode_chars(contents);
+                contents = base64_encode_chars(contents);
                 for (j = 0; j < BASE64_ENCODED_COUNT; ++j, ++l)
                 {
                         r[l] = contents.encoded[j];
@@ -210,13 +210,13 @@ char *base64simple_encode(unsigned char *a, size_t s)
 }
 
 /*
- * This function is a simple interface for the base64simple_decode_chars()
+ * This function is a simple interface for the base64_decode_chars()
  * function defined above. Client programs are meant to use this function
- * instead of using base64simple_decode_chars() directly. It takes a pointer
+ * instead of using base64_decode_chars() directly. It takes a pointer
  * to a string and returns the decoded version, also as a pointer to a string.
  * If a decode error occures, a NULL pointer is returned.
  */
-unsigned char *base64simple_decode(char *a, size_t s, size_t *rs)
+unsigned char *base64_decode(char *a, size_t s, size_t *rs)
 {
         size_t i, j, l;
         base64 contents = {.index = 0, .error = 0};
@@ -238,7 +238,7 @@ unsigned char *base64simple_decode(char *a, size_t s, size_t *rs)
                 contents.encoded[contents.index++] = a[i];
                 if (contents.index == BASE64_ENCODED_COUNT)
                 {
-                        contents = base64simple_decode_chars(contents);
+                        contents = base64_decode_chars(contents);
 
                         // Invalid encoding. Break out of loop.
                         if (contents.error)

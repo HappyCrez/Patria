@@ -1,6 +1,9 @@
+/**
+ * @file  dependencies.h
+ * @brief All program dependencies
+ */
+
 #pragma once
-// #include <openssl/ssl.h> // try to set ssl connection
-// #include <openssl/err.h>
 #include <openssl/sha.h>
 #include <arpa/inet.h>
 #include <pthread.h>
@@ -11,122 +14,57 @@
 #include <assert.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdbool.h>
 
-// Base definitions
-typedef long long ll;
-typedef char bool;
-typedef char byte;
+#define null NULL
 
 #define __DEBUG 1
 #define __OUTPUT_LOGS 1
 
-#define TRUE 1
-#define FALSE 0
-
-#define MEMORY_ERROR 1
-
+/**
+ * @brief pair nums
+ * @param first one value
+ * @param second another value
+ */
 struct pair
 {
-        ll first;
-        ll second;
+        int64_t first;
+        int64_t second;
 };
 
-struct server_response
-{
-        struct pair *data;
-        bool isWS;
-};
+/* Max len of filepath in windows */
+#define MAX_FILEPATH_SIZE 256
 
-// Pages
-#define MAX_FILEPATH_SIZE 1000 // The most depeer files is more shorter than 1000 symbols
-#define PATH_TO_CLIENT_FILES_LEN 9
-#define PATH_TO_CLIENT_FILES "./Client"
-#define PATH_TO_SRC_FILE_LEN 11
-#define PATH_TO_SRC_FILE "./Client/Z"
-#define PATH_TO_STORAGE "./temp/storage.txt"
+/* path to all clients files */
+#define CLIENT_PATH "./Client"
 
-// TCP connection
+/* main html file */
+#define HTML_FILEPATH "./Client/Z"
+
+/* path to DataBase file */
+#define DB_FILE "./temp/storage.txt"
+
+/* listen port */
 #define SERVER_PORT 8080
-#define MAX_REQUEST_SIZE 8000 // HTTP specification recommend
 
-enum server_error
+/* HTTP specification recommend */
+#define MAX_REQUEST_SIZE 8000
+
+/**
+ * @brief main erros on server execute
+ * @param SUCCESS no errors
+ * @param SOCKET_ERROR failed to create socket
+ * @param BIND_ERROR failed to bind port (port already in use)
+ * @param LISTEN_ERROR failed to open port for listen
+ * @param OPT_ERROR port configuring error
+ * @param ALLOCATION_ERROR malloc error occures
+ */
+enum server_error_codes
 {
         SUCCESS = 0,
         SOCKET_ERROR,
         BIND_ERROR,
         LISTEN_ERROR,
         OPT_ERROR,
-        ALLOCATION_ERROR,
-        JSON_FILE_INCORRECT
-};
-
-enum http_request
-{
-        UNKNOWN_REQUEST,
-        GET_REQUEST,
-        POST_REQUEST
-};
-
-// GET
-#define HTTP_GET "GET"
-#define HTTP_WS "WebSocket"
-
-enum http_get_types
-{
-        STD_URL,
-        WEB_SOCKET_URL
-};
-
-// POST types
-#define HTTP_POST "POST"
-#define HTTP_POST_LOGIN "login"
-#define HTTP_POST_RECV_MESSAGES "recv_messages"
-#define HTTP_POST_RECV_DIALOGS "recv_dialogs"
-
-enum http_post_types
-{
-        UNKNOWN_POST,
-        LOGIN_POST,
-        RECIVE_MESSAGES_POST,
-        RECIVE_DIALOGS_POST
-};
-
-// WEB SOCKET (WS)
-#define WS_KEY_LEN 24
-#define WS_KEY_FIELD_LEN 20
-#define WS_KEY_FIELD "Sec-WebSocket-Key: "
-
-#define GUID_LEN 37
-#define GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-#define GUIDKEY_LEN 61
-
-#define SHA1_LEN 41
-#define BASE64_LEN 56
-
-enum ws_parser_error_codes
-{
-        WS_OK,
-        WS_RESERVED_BITS_SET,
-        WS_INVALID_OPCODE,
-        WS_INVALID_CONTINUATION,
-        WS_CONTROL_TOO_LONG,
-        WS_NON_CANONICAL_LENGTH,
-        WS_FRAGMENTED_CONTROL,
-        WS_INVALID_DATA
-};
-
-enum websocket_flags
-{
-        // opcodes
-        WS_OP_CONTINUE = 0x0,
-        WS_OP_TEXT = 0x1,
-        WS_OP_BINARY = 0x2,
-        WS_OP_CLOSE = 0x8,
-        WS_OP_PING = 0x9,
-        WS_OP_PONG = 0xA,
-        WS_OP_MASK = 0xF,
-        
-        // marks
-        WS_FINAL_FRAME = 0x10,
-        WS_HAS_MASK = 0x20,
+        ALLOCATION_ERROR
 };

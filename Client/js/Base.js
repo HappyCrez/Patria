@@ -10,9 +10,6 @@ function connectToServer() {
     try {
         socket = new WebSocket("ws://127.0.0.1:8080/WebSocket");
         socket.onopen = () => {
-            //console.log("Connected");
-
-            // Drop connection "onfaild" options
             connection_delay = MIN_DELAY;
             connection_faild_cnt = 0;
         };
@@ -21,15 +18,13 @@ function connectToServer() {
             json = JSON.parse(event.data);
 
             if (json.search_login) {
-                //console.log("search:" + json.search_login);
-                createDialog(json.search_login);
-            } else if (json.send_message) {
-                json.send_message = json.send_message.replace(/\n/g, '<br>');
-                appendMessage(json.sender_login, json.send_message, false);
-
-            } else if (json.login) {
-                if (json.login == "SUCCESS") {
-                    messengerPageSetup(); // If login success sync data
+                addDialog(createDialog(json.search_login));
+            } else if (json.send_op) {
+                json.message = json.message.replace(/\n/g, '<br>');
+                appendMessage(json.send_op, json.message, false);
+            } else if (json.login_op) {
+                if (json.login_op == "SUCCESS") {
+                    messengerPageSetup(); /* If login success sync data */
                 } else {
                     //console.log("Access denied");
                 }
@@ -37,12 +32,10 @@ function connectToServer() {
         }
 
         socket.onclose = (event) => {
-            setPageState(login_page);
+            setPageState(states.LOGIN_PAGE);
         }
 
         socket.onerror = (event) => {
-            location.reload();
-
             //console.log("Connection failed, try again in " + connection_delay / 1000);
             setTimeout(connectToServer, connection_delay);
             connection_delay *= 2;
@@ -135,7 +128,6 @@ window.onload = function () {
 }
 
 window.onbeforeunload = function () {
-    //console.log("smthng");
     if (socket && socket.readyState === WebSocket.OPEN) {
         socket.close(1000, "Page unloaded");
     }
@@ -169,7 +161,7 @@ function login() {
         return;
     }
     client_login = username_login.value;
-    wsSend('{"login": "' + username_login.value + '", "password": "' + password_login.value + '"}');
+    wsSend('{"login_op": "' + username_login.value + '", "password": "' + password_login.value + '"}');
 }
 
 /*              Messenger page               */
@@ -247,7 +239,10 @@ function dialogsAddMessage(login, message_div) {
         addDialog(createDialog(login));
     }
     dialogs.get(login).push(message_div);
-    messages.appendChild(message_div);
+    if (reciver == login)
+    {
+        messages.appendChild(message_div);
+    }
 }
 
 message_submit.addEventListener('click', (event) => {
@@ -262,7 +257,7 @@ function sendMessage() {
 
     // In this version all self messages don't send on server
     if (reciver != self_chat) {
-        wsSend('{"send_message": "' + reciver + '", "message": "' + formatData(message) + '"}');
+        wsSend('{"send_op": "' + reciver + '", "message": "' + formatData(message) + '"}');
     }
 
     message = message.replace(/\n/g, '<br>');
@@ -303,9 +298,8 @@ message_input.addEventListener('input', (event) => {
 });
 
 search_bar.addEventListener('input', (event) => {
-    if (search_bar.value.length < 1) {
+    if (search_bar.value.length < 1)
         return;
-    }
     wsSend('{"search_login": "' + search_bar.value + '"}');
     return;
 });

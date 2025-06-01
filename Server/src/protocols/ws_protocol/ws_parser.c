@@ -1,4 +1,4 @@
-#include "parsers/web_socket_parser.h"
+#include "protocols/ws_protocol/ws.h"
 
 enum
 {
@@ -21,10 +21,13 @@ enum
         S_PAYLOAD,
 };
 
-void ws_parser_init(struct ws_parser *parser)
+struct ws_parser *ws_parser_init(struct ws_parser_callbacks *callbacks)
 {
+        struct ws_parser *parser = malloc(sizeof(struct ws_parser)); 
+        parser->callbacks = callbacks;
         parser->state = S_OPCODE;
         parser->fragment = 0;
+        return parser;
 }
 
 #define ADVANCE         \
@@ -40,7 +43,6 @@ void ws_parser_init(struct ws_parser *parser)
 
 int ws_parser_execute(
     struct ws_parser *parser,
-    const struct ws_parser_callbacks *callbacks,
     void *data,
     char *buff /* mutates! */,
     size_t len)
@@ -86,9 +88,9 @@ int ws_parser_execute(
 
                                 parser->control = 1;
                                 int rc = WS_OK;
-                                if (callbacks->on_control_begin)
+                                if (parser->callbacks->on_control_begin)
                                 {
-                                        rc = callbacks->on_control_begin(data, opcode);
+                                        rc = parser->callbacks->on_control_begin(data, opcode);
                                         if (rc)
                                         {
                                                 return rc;
@@ -106,9 +108,9 @@ int ws_parser_execute(
                                 parser->fragment = !parser->fin;
 
                                 int rc = WS_OK;
-                                if (callbacks->on_data_begin)
+                                if (parser->callbacks->on_data_begin)
                                 {
-                                        rc = callbacks->on_data_begin(data, opcode);
+                                        rc = parser->callbacks->on_data_begin(data, opcode);
                                         if (rc)
                                         {
                                                 return rc;
@@ -297,16 +299,16 @@ int ws_parser_execute(
                         int rc = WS_OK;
                         if (parser->control)
                         {
-                                if (callbacks->on_control_payload)
+                                if (parser->callbacks->on_control_payload)
                                 {
-                                        rc = callbacks->on_control_payload(data, buff, chunk_length);
+                                        rc = parser->callbacks->on_control_payload(data, buff, chunk_length);
                                 }
                         }
                         else
                         {
-                                if (callbacks->on_data_payload)
+                                if (parser->callbacks->on_data_payload)
                                 {
-                                        rc = callbacks->on_data_payload(data, buff, chunk_length);
+                                        rc = parser->callbacks->on_data_payload(data, buff, chunk_length);
                                 }
                         }
 
@@ -333,16 +335,16 @@ int ws_parser_execute(
                                 int rc = WS_OK;
                                 if (parser->control)
                                 {
-                                        if (callbacks->on_control_end)
+                                        if (parser->callbacks->on_control_end)
                                         {
-                                                rc = callbacks->on_control_end(data);
+                                                rc = parser->callbacks->on_control_end(data);
                                         }
                                 }
                                 else
                                 {
-                                        if (callbacks->on_data_end)
+                                        if (parser->callbacks->on_data_end)
                                         {
-                                                rc = callbacks->on_data_end(data);
+                                                rc = parser->callbacks->on_data_end(data);
                                         }
                                 }
                                 if (rc)

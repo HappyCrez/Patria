@@ -1,1 +1,0 @@
-typedef struct network_manager network_manager;

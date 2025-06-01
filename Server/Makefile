@@ -3,18 +3,20 @@
 
 TARGET = PatriaServer
 
-SRC = 							\
-	src/main.c 					\
-	src/server.c 					\
-	src/network_manager.c 				\
-	src/algoritms/base64_coder.c 			\
-	src/algoritms/bst.c				\
-	src/algoritms/common_base_algoritms.c		\
-	src/file_helper.c 				\
-	src/web_socket_handler.c			\
-	src/parsers/json_parser.c 			\
-	src/parsers/web_socket_parser.c			\
-	src/parsers/web_socket_builder.c
+SRC = 								\
+	src/main.c 						\
+	src/server.c 						\
+	src/manager.c 						\
+	src/utils/bst.c						\
+	src/utils/string.c					\
+	src/utils/base64.c 					\
+	src/utils/file_tool.c					\
+	src/protocols/json_parser.c 				\
+	src/protocols/ws_protocol/ws_builder.c			\
+	src/protocols/ws_protocol/ws_parser.c			\
+	src/protocols/ws_protocol/ws_handler.c			\
+	src/protocols/http_protocol/http_builder.c 		\
+	src/protocols/http_protocol/http_handler.c		
 
 INCLUDE = \
 	include/
