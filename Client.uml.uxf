@@ -1,5 +1,0 @@
-<diagram program="umletino" version="15.1"><zoom_level>11</zoom_level><element><id>UMLClass</id><coordinates><x>1452</x><y>275</y><w>231</w><h>143</h></coordinates><panel_attributes>ServerLauncher
---
-
---
-+Loop() : void</panel_attributes><additional_attributes></additional_attributes></element></diagram>
